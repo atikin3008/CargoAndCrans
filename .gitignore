@@ -1,0 +1,35 @@
+# Development environments
+.idea/
+.vscode/
+
+# CMake / CLion-generated output
+/build/
+/cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+Testing/
+compile_commands.json
+
+# Compiled objects
+*.o
+*.obj
+*.lo
+*.la
+
+# Compiled libraries
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+
+# Executables / bundles
+*.exe
+*.out
+*.app
+
+# OS cruft
+.DS_Store
+Thumbs.db
