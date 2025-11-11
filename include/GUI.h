@@ -13,11 +13,12 @@ namespace gui{
 
         private:
         std::shared_ptr<Ship> ship;
+        int x, y;
     };
     class GUI{
         public:
         GUI(std::string settingsFilename);
-        void generateAnimations(Port port);
+        void generateAnimations(Port &port);
         private:
         std::vector<std::shared_ptr<AnimationPosition>> all;
     };
