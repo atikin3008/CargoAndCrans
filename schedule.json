@@ -1,0 +1,40 @@
+{
+  "schedule": [
+    {
+      "ship_id": 1,
+      "ship_name": "Атлант",
+      "arrival_date": 1,
+      "arrival_time": "08:00",
+      "cargo_type": "bulk",
+      "cargo_weight_tonnes": 15000,
+      "planned_stay_days": 4
+    },
+    {
+      "ship_id": 2,
+      "ship_name": "Нефтяной поток",
+      "arrival_date": 2,
+      "arrival_time": "14:30",
+      "cargo_type": "liquid",
+      "cargo_weight_tonnes": 50000,
+      "planned_stay_days": 3
+    },
+    {
+      "ship_id": 3,
+      "ship_name": "Контейнеровоз Восточный",
+      "arrival_date": 3,
+      "arrival_time": "09:15",
+      "cargo_type": "container",
+      "cargo_weight_tonnes": 20000,
+      "planned_stay_days": 5
+    },
+    {
+      "ship_id": 4,
+      "ship_name": "Зернорой",
+      "arrival_date": 5,
+      "arrival_time": "11:00",
+      "cargo_type": "bulk",
+      "cargo_weight_tonnes": 10000,
+      "planned_stay_days": 2
+    }
+  ]
+}

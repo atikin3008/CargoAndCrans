@@ -1,15 +1,52 @@
 #pragma once
-#include "Event.h"
-#include "Types.h"
-#include<fstream>
-#include<vector>
-#include<memory>
+#include <memory>
+#include <iostream>
+#include <iomanip>
+#include <vector>
 #include <string>
+#include <algorithm>
+#include <stdexcept>
+#include <fstream>
+#include "Ship.h"
+#include "nlohmann/json.hpp"
+#include "../include/Types.h"
 
-class Schedule{
+namespace schedule {
+    class ScheduleEvent {
     public:
-    Schedule(std::string file_name);
-    std::vector<std::shared_ptr<ArrivalEvent>> get(types::time_t);
-private:
-    std::vector<std::shared_ptr<ArrivalEvent>> schedule;
-};
+        std::shared_ptr<Ship> ship;              
+        int         arrival_date = 0;  
+        types::time_t arrival_time = 0;      
+        int         planned_stay_days = 0;
+
+        ScheduleEvent() = default;
+
+        ScheduleEvent(std::shared_ptr<Ship> s, int date, types::time_t time, int stay_days)
+            : ship(std::move(s)),
+            arrival_date(date),
+            arrival_time(time),
+            planned_stay_days(stay_days) {}
+
+        void print();
+
+    private:
+        std::string cargoTypeToString(types::CargoType type);
+        std::string formatDate(int day);
+        std::string formatTime(int hours, int minutes);
+    };
+
+    class Schedule {
+    private:
+        std::vector<ScheduleEvent> events;
+
+        static types::CargoType stringToCargoType(const std::string& type_str);
+        static types::time_t parseTime(const std::string& time_str);
+
+    public:
+        bool loadFromJSON(const std::string& filename);
+        const std::vector<ScheduleEvent>& getEvents() const;
+        std::vector<ScheduleEvent> getEventsByCargoType(types::CargoType type) const;
+        std::vector<ScheduleEvent> getEventsByArrivalDate(int day) const;
+    };
+
+} // namespace schedule
