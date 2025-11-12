@@ -7,6 +7,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 add_executable(Cargo_and_crans
         main.cpp
-        src/Settings.cpp)
+        src/Settings.cpp
+        src/GUI.cpp)
 
 target_link_libraries(Cargo_and_crans PRIVATE nlohmann_json::nlohmann_json)
