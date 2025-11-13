@@ -74,12 +74,12 @@ namespace schedule {
         return hours * 60 + minutes;
     }
 
-    bool Schedule::loadFromJSON(const std::string& filename) {
+    Schedule::Schedule(const std::string& filename) {
         try {
             std::ifstream file(filename);
             if (!file.is_open()) {
                 std::cerr << "Error: cannot open file " << filename << std::endl;
-                return false;
+                throw std::invalid_argument("Cannot open file");
             }
 
             json json_data;
@@ -111,34 +111,21 @@ namespace schedule {
                         }
                         return a.arrival_date < b.arrival_date;
                     });
-
-            return true;
         } catch (const std::exception& ex) {
             std::cerr << "JSON parse error: " << ex.what() << std::endl;
-            return false;
+            throw std::invalid_argument("JSON parse error");
         }
     }
 
-    const std::vector<ScheduleEvent>& Schedule::getEvents() const {
-        return events;
-    }
-
-    std::vector<ScheduleEvent> Schedule::getEventsByCargoType(types::CargoType type) const {
-        std::vector<ScheduleEvent> out;
-        out.reserve(events.size());
-        for (const auto& ev : events) {
-            if (ev.ship->cargo_type == type) out.push_back(ev);
+    std::vector<ScheduleEvent> Schedule::getEvents(types::time_t time) const {
+        std::vector<ScheduleEvent> answer;
+        for (int i = 0; i < events.size(); i++) {
+            types::time_t seconds = (events[i].arrival_date-1) * 86400 + events[i].arrival_time;
+            if (seconds == time) {
+                answer.push_back(events[i]);
+            }
         }
-        return out;
-    }
-
-    std::vector<ScheduleEvent> Schedule::getEventsByArrivalDate(int day) const {
-        std::vector<ScheduleEvent> out;
-        out.reserve(events.size());
-        for (const auto& ev : events) {
-            if (ev.arrival_date == day) out.push_back(ev);
-        }
-        return out;
+        return answer;
     }
 
 } // namespace schedule

@@ -36,17 +36,15 @@ namespace schedule {
     };
 
     class Schedule {
-    private:
+     public:
+        Schedule(const std::string& filename);
+        std::vector<ScheduleEvent> getEvents(types::time_t time) const;
+        
+     private:
         std::vector<ScheduleEvent> events;
 
         static types::CargoType stringToCargoType(const std::string& type_str);
         static types::time_t parseTime(const std::string& time_str);
-
-    public:
-        bool loadFromJSON(const std::string& filename);
-        const std::vector<ScheduleEvent>& getEvents() const;
-        std::vector<ScheduleEvent> getEventsByCargoType(types::CargoType type) const;
-        std::vector<ScheduleEvent> getEventsByArrivalDate(int day) const;
     };
 
 } // namespace schedule
