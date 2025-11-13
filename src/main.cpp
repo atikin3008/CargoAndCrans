@@ -1,9 +1,15 @@
-#include"../include/Port.h"
-#include"../include/GUI.h"
+#include "../include/Settings.h"
 
-int main(){
-    Port port("", "");
-    port.process();
-    gui::GUI gui("");
-    gui.generateAnimations(port);
+#include <iostream>
+
+int main() {
+    Settings settings("../test.json");
+    auto items = settings.get<SettingsNode::array_t>("xuila");
+
+    for (auto &item : items) {
+        std::cout << "a=" << item.at("a").as<std::int64_t>() << ", b="
+                  << item.at("b").as<std::int64_t>() << '\n';
+    }
+
+    return 0;
 }

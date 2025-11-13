@@ -95,7 +95,7 @@ class Settings {
 
     const SettingsNode &operator()(const std::string &key) const;
 
-    template <typename T>
+    template <typename T = SettingsNode>
     T get(const std::string &key) const {
         return (*this)(key).template as<T>();
     }
@@ -149,6 +149,7 @@ inline std::size_t SettingsNode::size() const {
     return 0;
 }
 
-inline [[noreturn]] void SettingsNode::raiseTypeError(const char *expected) const {
+[[noreturn]] inline void SettingsNode::raiseTypeError(const char *expected) const
+{
     throw std::runtime_error(std::string("Settings node does not contain a ") + expected);
 }
