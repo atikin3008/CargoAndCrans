@@ -1,4 +1,5 @@
 #include "../include/Schedule.h"
+#include "../include/Settings.h"
 
 using json = nlohmann::json;
 
@@ -75,46 +76,34 @@ namespace schedule {
     }
 
     Schedule::Schedule(const std::string& filename) {
-        try {
-            std::ifstream file(filename);
-            if (!file.is_open()) {
-                std::cerr << "Error: cannot open file " << filename << std::endl;
-                throw std::invalid_argument("Cannot open file");
-            }
+        Settings settingsFile("schedule.json");
+        auto settings = settingsFile.get("schedule");
+        
+        for (auto ship_settings : settings.as<SettingsNode::array_t>()) {
+            auto ship = std::make_shared<Ship>(
+                ship_settings.at("ship_id").as<int64_t>(),
+                ship_settings.at("ship_name").as<std::string>(),
+                ship_settings.at("cargo_weight_tonnes").as<types::mass_t>(),
+                stringToCargoType(ship_settings.at("cargo_type").as<std::string>())
+            );
+            
+            ScheduleEvent se {
+                std::move(ship),
+                ship_settings.at("arrival_date").as<int>(),
+                parseTime(ship_settings.at("arrival_time").as<std::string>()),
+                ship_settings.at("planned_stay_days").as<int>()
+            };
 
-            json json_data;
-            file >> json_data;
-
-            events.clear();
-            for (const auto& e : json_data["schedule"]) {
-                auto ship = std::make_shared<Ship>(
-                    e["ship_id"].get<int>(),
-                    e["ship_name"].get<std::string>(),
-                    e["cargo_weight_tonnes"].get<double>(),
-                    stringToCargoType(e["cargo_type"].get<std::string>())
-                );
-
-                ScheduleEvent se{
-                    std::move(ship),
-                    e["arrival_date"].get<int>(),
-                    parseTime(e["arrival_time"].get<std::string>()),
-                    e["planned_stay_days"].get<int>()
-                };
-
-                events.push_back(std::move(se));
-            }
-
-            std::sort(events.begin(), events.end(),
-                    [](const ScheduleEvent& a, const ScheduleEvent& b) {
-                        if (a.arrival_date == b.arrival_date) {
-                            return a.arrival_time < b.arrival_time;
-                        }
-                        return a.arrival_date < b.arrival_date;
-                    });
-        } catch (const std::exception& ex) {
-            std::cerr << "JSON parse error: " << ex.what() << std::endl;
-            throw std::invalid_argument("JSON parse error");
+            events.push_back(std::move(se));
         }
+
+        std::sort(events.begin(), events.end(),
+                [](const ScheduleEvent& a, const ScheduleEvent& b) {
+                    if (a.arrival_date == b.arrival_date) {
+                        return a.arrival_time < b.arrival_time;
+                    }
+                    return a.arrival_date < b.arrival_date;
+                });
     }
 
     std::vector<ScheduleEvent> Schedule::getEvents(types::time_t time) const {

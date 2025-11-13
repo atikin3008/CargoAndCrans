@@ -5,12 +5,10 @@
 
 class Ship {
 public:
-    int         id = 0; 
+    int         id;
     std::string name;
-    double      cargo_weight_tonnes = 0.0;
-    types::CargoType   cargo_type = types::CargoType::BULK;
-
-    Ship() = default;
+    double      cargo_weight_tonnes;
+    types::CargoType   cargo_type;
 
     Ship(int id_, std::string name_, double weight_, types::CargoType type_)
         : id(id_), name(std::move(name_)), cargo_weight_tonnes(weight_), cargo_type(type_) {}

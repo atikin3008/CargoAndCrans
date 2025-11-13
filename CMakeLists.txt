@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(Cargo_and_crans
         src/main.cpp
-        # src/Settings.cpp
+        src/Settings.cpp
         # src/GUI.cpp
         src/Schedule.cpp 
         )
