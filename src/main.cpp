@@ -1,15 +1,11 @@
 #include "../include/Settings.h"
-
-#include <iostream>
+#include "../include/GUI.h"
+#include "../include/Port.h"
 
 int main() {
-    Settings settings("../test.json");
-    auto items = settings.get<SettingsNode::array_t>("xuila");
-
-    for (auto &item : items) {
-        std::cout << "a=" << item.at("a").as<std::int64_t>() << ", b="
-                  << item.at("b").as<std::int64_t>() << '\n';
-    }
-
-    return 0;
+    setlocale(LC_ALL, "ru_RU.UTF-8");
+    Port port("", "");
+    port.process();
+    gui::GUI gui("");
+    gui.generateAnimations(port);
 }

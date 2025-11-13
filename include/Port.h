@@ -15,6 +15,6 @@ class Port{
     std::vector<std::shared_ptr<Event>> get(types::time_t time);
     private:
     EventLog eventLog;
-    Schedule Schedule;
+    schedule::Schedule Schedule;
     Settings settings;
 };
