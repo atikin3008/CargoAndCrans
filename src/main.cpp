@@ -1,14 +1,12 @@
+#include "../include/Port.h"
 #include "../include/Schedule.h"
+#include<iostream>
 
 int main() {
     setlocale(LC_ALL, "ru_RU.UTF-8");
-    schedule::Schedule schedule("schedule.json");
-    for (types::time_t time = 0; time <= 30 * 86400; time++) {
-        auto cur_events = schedule.getEvents(time);
-        if (cur_events.size() > 0) {
-            for (auto event : cur_events) {
-                event.print();
-            }
-        }
-    }
+    Port port("../settings.json", "../schedule.json");
+    port.process();
+    schedule::Schedule s("../schedule.json");
+    for(int i = 0; i < 20000; ++i)
+        std::cout << s.getEvents(i).size() << "\n";
 }

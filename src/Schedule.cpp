@@ -76,7 +76,7 @@ namespace schedule {
     }
 
     Schedule::Schedule(const std::string& filename) {
-        Settings settingsFile("schedule.json");
+        Settings settingsFile(filename);
         auto settings = settingsFile.get("schedule");
         
         for (auto ship_settings : settings.as<SettingsNode::array_t>()) {
