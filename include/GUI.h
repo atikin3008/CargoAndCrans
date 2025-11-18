@@ -78,6 +78,10 @@ class GUI {
     const std::vector<std::shared_ptr<AnimationPosition>> &animations() const noexcept { return timeline_; }
     std::vector<std::shared_ptr<const AnimationPosition>> stateAt(types::time_t moment,
                                                                   std::uint16_t subframe = 0) const;
+    types::time_t simulationTicks() const noexcept { return simulationTicks_; }
+    std::uint16_t framesPerTick() const noexcept { return framesPerTick_; }
+    std::size_t frameCount() const { return totalFrameCount(); }
+    const AnimationLayout &layout() const noexcept { return layout_; }
 
   private:
     types::time_t readSimulationTicks() const;

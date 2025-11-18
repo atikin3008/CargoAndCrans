@@ -2,7 +2,7 @@
   "schedule": [
     {
       "ship_id": 1,
-      "ship_name": "Атлант",
+      "ship_name": "Atlant",
       "arrival_date": 1,
       "arrival_time": "08:00",
       "cargo_type": "bulk",
@@ -11,7 +11,7 @@
     },
     {
       "ship_id": 2,
-      "ship_name": "Нефтяной поток",
+      "ship_name": "Neftyanoi Potok",
       "arrival_date": 2,
       "arrival_time": "14:30",
       "cargo_type": "liquid",
@@ -20,7 +20,7 @@
     },
     {
       "ship_id": 3,
-      "ship_name": "Контейнеровоз Восточный",
+      "ship_name": "Vostochny Container",
       "arrival_date": 3,
       "arrival_time": "09:15",
       "cargo_type": "container",
@@ -29,7 +29,7 @@
     },
     {
       "ship_id": 4,
-      "ship_name": "Зернорой",
+      "ship_name": "Zernoroy",
       "arrival_date": 5,
       "arrival_time": "11:00",
       "cargo_type": "bulk",

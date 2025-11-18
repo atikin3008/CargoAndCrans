@@ -1,4 +1,4 @@
-#include "GUI.h"
+#include "../include/GUI.h"
 
 #include <algorithm>
 #include <cmath>
@@ -36,17 +36,39 @@ Target clampToUnsigned(std::int64_t value, const char *keyName) {
     return static_cast<Target>(value);
 }
 
-AnimationPhase detectPhase(types::EventType type) {
+gui::AnimationPhase detectPhase(types::EventType type) {
     switch (type) {
         case types::EventType::ON_SHIP_ARRIVAL:
-            return AnimationPhase::Arrival;
+            return gui::AnimationPhase::Arrival;
         case types::EventType::ON_SHIP_IN_CRANE:
-            return AnimationPhase::Docking;
+            return gui::AnimationPhase::Docking;
         case types::EventType::ON_SHIP_DEPARTURE:
-            return AnimationPhase::Departure;
-        default:
-            return AnimationPhase::Arrival;
+            return gui::AnimationPhase::Departure;
     }
+    return gui::AnimationPhase::Arrival;
+}
+
+gui::AnimationLayout defaultLayout() {
+    gui::AnimationLayout layout;
+    layout.arrivalDuration = 8;
+    layout.unloadingDuration = 6;
+    layout.departureDuration = 8;
+
+    constexpr int laneSpacing = 40;
+    constexpr int arrivalX = 0;
+    constexpr int dockX = 50;
+    constexpr int departureX = 100;
+
+    for (int laneIndex = 0; laneIndex < 3; ++laneIndex) {
+        gui::LaneLayout lane;
+        const int y = laneIndex * laneSpacing;
+        lane.arrivalEntry = {arrivalX, y};
+        lane.dockPoint = {dockX, y};
+        lane.departureExit = {departureX, y};
+        layout.lanes.push_back(lane);
+    }
+
+    return layout;
 }
 
 } // namespace
@@ -96,8 +118,18 @@ void GUI::generateAnimations(Port &port) {
 }
 
 types::time_t GUI::readSimulationTicks() const {
-    const auto rawTicks = settings_.get<std::int64_t>(kSimulationTicksKey);
-    return clampToUnsigned<types::time_t>(rawTicks, kSimulationTicksKey);
+    try {
+        const auto rawTicks = settings_.get<std::int64_t>(kSimulationTicksKey);
+        return clampToUnsigned<types::time_t>(rawTicks, kSimulationTicksKey);
+    } catch (const std::exception &) {
+        try {
+            const auto fallback = settings_.get<std::int64_t>("ticks_amount");
+            return clampToUnsigned<types::time_t>(fallback, "ticks_amount");
+        } catch (const std::exception &) {
+            throw std::runtime_error(
+                "Settings must define either 'simulation_ticks' or 'ticks_amount' for the GUI to work");
+        }
+    }
 }
 
 std::uint16_t GUI::readUnloadFrames() const {
@@ -130,7 +162,7 @@ void GUI::appendAnimationsForTime(Port &port, types::time_t timePoint) {
             continue;
         }
 
-        switch (event->get_type()) {
+        switch (event->getType()) {
             case types::EventType::ON_SHIP_ARRIVAL: {
                 const auto &lane = laneForIndex(nextArrivalLane_++);
                 createTravelFrames(lane.arrivalEntry,
@@ -176,11 +208,11 @@ GUI::stateAt(types::time_t moment, std::uint16_t subframe) const {
         return result;
     }
 
-    const auto &weakList = framesByFrame_[index];
-    result.reserve(weakList.size());
-    for (const auto &weakPtr : weakList) {
-        if (auto locked = weakPtr.lock()) {
-            result.emplace_back(std::const_pointer_cast<const AnimationPosition>(locked));
+    const auto &frameList = framesByFrame_[index];
+    result.reserve(frameList.size());
+    for (const auto &weakFrame : frameList) {
+        if (auto locked = weakFrame.lock()) {
+            result.emplace_back(std::static_pointer_cast<const AnimationPosition>(locked));
         }
     }
 
@@ -188,8 +220,8 @@ GUI::stateAt(types::time_t moment, std::uint16_t subframe) const {
 }
 
 AnimationLayout GUI::loadLayoutFromSettings() const {
-    AnimationLayout layout;
     try {
+        AnimationLayout layout;
         const auto &root = settings_.root();
         const auto &animationNode = root.at(kAnimationKey);
         const auto &durations = animationNode.at(kDurationsKey);
@@ -225,18 +257,18 @@ AnimationLayout GUI::loadLayoutFromSettings() const {
             LaneLayout lane;
             lane.arrivalEntry = readCoordinateNode(coords.at(kArrivalEntryKey), std::string(kArrivalEntryKey));
             lane.dockPoint = readCoordinateNode(coords.at(kDockKey), std::string(kDockKey));
-            lane.departureExit = readCoordinateNode(coords.at(kDepartureExitKey), std::string(kDepartureExitKey));
+            lane.departureExit =
+                readCoordinateNode(coords.at(kDepartureExitKey), std::string(kDepartureExitKey));
             layout.lanes.push_back(std::move(lane));
         }
-    } catch (const std::exception &err) {
-        throw std::runtime_error(std::string("Failed to load animation layout: ") + err.what());
-    }
+        if (layout.lanes.empty()) {
+            layout.lanes.push_back({});
+        }
 
-    if (layout.lanes.empty()) {
-        layout.lanes.push_back({});
+        return layout;
+    } catch (const std::exception &) {
+        return defaultLayout();
     }
-
-    return layout;
 }
 
 Coordinate GUI::readCoordinateNode(const SettingsNode &node, const std::string &name) const {
@@ -291,9 +323,6 @@ void GUI::createTravelFrames(const Coordinate &from,
 
         auto frame = std::make_shared<AnimationPosition>(tick, sub, eventType, event);
         frame->setCoordinates(x, y);
-        if (eventType == types::EventType::ON_SHIP_IN_CRANE && unloadFramesPerEvent_ > 0) {
-            frame->markForUnloading(unloadFramesPerEvent_);
-        }
         registerFrame(frameIndex, std::move(frame));
     }
 }
@@ -323,7 +352,7 @@ void GUI::createHoldFrames(const Coordinate &point,
         const types::time_t tick = static_cast<types::time_t>(frameIndex / framesPerTick_);
         const std::uint16_t sub = static_cast<std::uint16_t>(frameIndex % framesPerTick_);
 
-        auto frame = std::make_shared<AnimationPosition>(tick, sub, event->get_type(), event);
+        auto frame = std::make_shared<AnimationPosition>(tick, sub, event->getType(), event);
         frame->setCoordinates(point.x, point.y);
         if (unloadFramesPerEvent_ > 0) {
             frame->markForUnloading(unloadFramesPerEvent_);
