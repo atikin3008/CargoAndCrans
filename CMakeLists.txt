@@ -9,7 +9,7 @@ add_executable(Cargo_and_crans
         # src/GUI.cpp
         src/Schedule.cpp
         src/Port.cpp
-        src/Cran.cpp
+        src/Crane.cpp
         src/EventLog.cpp
         src/Event.cpp
         )
