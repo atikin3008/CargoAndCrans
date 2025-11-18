@@ -48,7 +48,7 @@ elseif(APPLE)
         endif()
     endif()
     set(SFML_COMPONENTS Graphics System Window)
-    find_package(SFML 2.6 COMPONENTS ${SFML_COMPONENTS} REQUIRED)
+    find_package(SFML COMPONENTS ${SFML_COMPONENTS} REQUIRED)
     
 else()
     # Настройки для Linux и других систем
