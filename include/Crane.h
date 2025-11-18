@@ -5,9 +5,9 @@
 #include<memory>
 
 
-class Cran {
+class Crane {
  public:
-    Cran(types::CargoType cargoType);
+    Crane(types::CargoType cargoType);
     void addShip(const std::shared_ptr<Ship>& ship, types::time_t time);
     bool isBusy(types::time_t time);
     std::shared_ptr<Ship> getShip();

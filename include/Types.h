@@ -2,6 +2,7 @@
 #include<cinttypes>
 #include<string>
 #include<exception>
+#include <stdexcept>
 
 namespace types{
     typedef uint32_t time_t;
@@ -14,15 +15,25 @@ namespace types{
 
     enum class EventType{
         ON_SHIP_ARRIVAL,
-        ON_SHIP_IN_CRAN,
-        ON_SHIP_DEPATURE
+        ON_SHIP_IN_CRANE,
+        ON_SHIP_DEPARTURE
     };
+
+    inline std::string getStringByEventType(EventType event) {
+        switch(event){
+            case EventType::ON_SHIP_ARRIVAL: return "ship arrival";
+            case EventType::ON_SHIP_IN_CRANE: return "ship in crane";
+            case EventType::ON_SHIP_DEPARTURE: return "ship departure";
+            default: throw std::logic_error("incorrect event type");
+        }
+    }
 
     inline double getSpeedOfUnloadCargo(CargoType type){
         switch(type){
             case CargoType::BULK: return 10.;
             case CargoType::LIQUID: return 20.;
             case CargoType::CONTAINER: return 30.;
+            default: throw std::logic_error("incorrect event type");
         }
     }
     inline CargoType getTypeByString(const std::string &type){
@@ -33,6 +44,5 @@ namespace types{
         if(type == "CONTAINER")
             return CargoType::CONTAINER;
         throw std::runtime_error("Bad type name");
-
     }
 }

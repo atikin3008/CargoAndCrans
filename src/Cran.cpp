@@ -1,8 +1,9 @@
-#include "../include/Cran.h"
+#include "../include/Crane.h"
+#include <cmath>
 
-Cran::Cran(types::CargoType type) : cargoType_(type), ship_(nullptr), end_(0) {}
+Crane::Crane(types::CargoType type) : cargoType_(type), ship_(nullptr), end_(0) {}
 
-void Cran::addShip(const std::shared_ptr<Ship> &ship, types::time_t time) {
+void Crane::addShip(const std::shared_ptr<Ship> &ship, types::time_t time) {
     if(!ship){
         ship_ = nullptr;
         end_ = 0;
@@ -16,7 +17,7 @@ void Cran::addShip(const std::shared_ptr<Ship> &ship, types::time_t time) {
     end_ = time + (types::time_t) std::ceil(ship->cargo_weight_tonnes / types::getSpeedOfUnloadCargo(ship->cargo_type));
 }
 
-bool Cran::isBusy(types::time_t time) {
+bool Crane::isBusy(types::time_t time) {
     if (!ship_)
         return false;
     if (end_ <= time)
@@ -24,14 +25,14 @@ bool Cran::isBusy(types::time_t time) {
     return true;
 }
 
-types::CargoType Cran::getType() {
+types::CargoType Crane::getType() {
     return cargoType_;
 }
 
-std::shared_ptr<Ship> Cran::getShip(){
+std::shared_ptr<Ship> Crane::getShip(){
     return ship_;
 }
 
-bool Cran::shipInCran(){
+bool Crane::shipInCran(){
     return ship_.get();
 }

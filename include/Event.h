@@ -2,7 +2,7 @@
 
 #include"Types.h"
 #include"Ship.h"
-#include"Cran.h"
+#include"Crane.h"
 #include<memory>
 #include <utility>
 
@@ -40,33 +40,33 @@ class ArrivalEvent : public Event {
     std::shared_ptr<Ship> ship_;
 };
 
-class InCranEvent : public Event {
+class InCraneEvent : public Event {
  public:
-    InCranEvent(std::shared_ptr<Ship> ship, std::shared_ptr<Cran> cran, types::time_t time) : ship_(std::move(ship)),
-                                                                                              cran_(std::move(cran)),
+    InCraneEvent(std::shared_ptr<Ship> ship, std::shared_ptr<Crane> crane, types::time_t time) : ship_(std::move(ship)),
+                                                                                              crane_(std::move(crane)),
                                                                                               Event(time) {}
 
     types::EventType getType() override {
-        return types::EventType::ON_SHIP_IN_CRAN;
+        return types::EventType::ON_SHIP_IN_CRANE;
     }
 
  private:
     std::shared_ptr<Ship> ship_;
-    std::shared_ptr<Cran> cran_;
+    std::shared_ptr<Crane> crane_;
 };
 
 
-class DepatureEvent : public Event {
+class DepartureEvent : public Event {
  public:
-    DepatureEvent(std::shared_ptr<Ship> ship, std::shared_ptr<Cran> cran, types::time_t time) : ship_(std::move(ship)),
-                                                                                                cran_(std::move(cran)),
+    DepartureEvent(std::shared_ptr<Ship> ship, std::shared_ptr<Crane> crane, types::time_t time) : ship_(std::move(ship)),
+                                                                                                crane_(std::move(crane)),
                                                                                                 Event(time) {}
 
     types::EventType getType() override {
-        return types::EventType::ON_SHIP_DEPATURE;
+        return types::EventType::ON_SHIP_DEPARTURE;
     }
 
  private:
     std::shared_ptr<Ship> ship_;
-    std::shared_ptr<Cran> cran_;
+    std::shared_ptr<Crane> crane_;
 };

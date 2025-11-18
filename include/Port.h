@@ -19,5 +19,5 @@ class Port{
     schedule::Schedule schedule;
     Settings settings;
     std::vector<std::shared_ptr<Ship>> shipsInOrder;
-    std::vector<std::shared_ptr<Cran>> crans;
+    std::vector<std::shared_ptr<Crane>> crans;
 };

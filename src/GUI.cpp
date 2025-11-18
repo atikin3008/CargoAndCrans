@@ -40,9 +40,9 @@ AnimationPhase detectPhase(types::EventType type) {
     switch (type) {
         case types::EventType::ON_SHIP_ARRIVAL:
             return AnimationPhase::Arrival;
-        case types::EventType::ON_SHIP_IN_CRAN:
+        case types::EventType::ON_SHIP_IN_CRANE:
             return AnimationPhase::Docking;
-        case types::EventType::ON_SHIP_DEPATURE:
+        case types::EventType::ON_SHIP_DEPARTURE:
             return AnimationPhase::Departure;
         default:
             return AnimationPhase::Arrival;
@@ -141,7 +141,7 @@ void GUI::appendAnimationsForTime(Port &port, types::time_t timePoint) {
                                    event);
                 break;
             }
-            case types::EventType::ON_SHIP_IN_CRAN: {
+            case types::EventType::ON_SHIP_IN_CRANE: {
                 const auto &lane = laneForIndex(nextDockLane_++);
                 types::time_t duration = layout_.unloadingDuration;
                 if (duration == 0) {
@@ -150,13 +150,13 @@ void GUI::appendAnimationsForTime(Port &port, types::time_t timePoint) {
                 createHoldFrames(lane.dockPoint, timePoint, duration, event);
                 break;
             }
-            case types::EventType::ON_SHIP_DEPATURE: {
+            case types::EventType::ON_SHIP_DEPARTURE: {
                 const auto &lane = laneForIndex(nextDepartureLane_++);
                 createTravelFrames(lane.dockPoint,
                                    lane.departureExit,
                                    timePoint,
                                    layout_.departureDuration,
-                                   types::EventType::ON_SHIP_DEPATURE,
+                                   types::EventType::ON_SHIP_DEPARTURE,
                                    event);
                 break;
             }
@@ -291,7 +291,7 @@ void GUI::createTravelFrames(const Coordinate &from,
 
         auto frame = std::make_shared<AnimationPosition>(tick, sub, eventType, event);
         frame->setCoordinates(x, y);
-        if (eventType == types::EventType::ON_SHIP_IN_CRAN && unloadFramesPerEvent_ > 0) {
+        if (eventType == types::EventType::ON_SHIP_IN_CRANE && unloadFramesPerEvent_ > 0) {
             frame->markForUnloading(unloadFramesPerEvent_);
         }
         registerFrame(frameIndex, std::move(frame));
