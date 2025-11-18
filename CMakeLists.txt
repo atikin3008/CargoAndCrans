@@ -7,7 +7,11 @@ add_executable(Cargo_and_crans
         src/main.cpp
         src/Settings.cpp
         # src/GUI.cpp
-        src/Schedule.cpp 
+        src/Schedule.cpp
+        src/Port.cpp
+        src/Cran.cpp
+        src/EventLog.cpp
+        src/Event.cpp
         )
 
 find_package(nlohmann_json 3.11.2 REQUIRED)
