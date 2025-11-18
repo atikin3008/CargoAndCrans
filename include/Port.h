@@ -14,6 +14,8 @@ class Port{
     void process();
     std::vector<std::shared_ptr<Event>> get(types::time_t time);
     std::vector<std::shared_ptr<Event>> get();
+    const Settings &getSettings() const;
+    const std::vector<std::shared_ptr<Crane>> &getCranes() const;
  private:
     EventLog eventLog;
     schedule::Schedule schedule;

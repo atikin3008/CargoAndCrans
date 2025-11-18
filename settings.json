@@ -1,8 +1,8 @@
 {
   "cranes_amount": {
-    "BULK": 20,
-    "LIQUID": 20,
-    "CONTAINER": 20
+    "BULK": 2,
+    "LIQUID": 2,
+    "CONTAINER": 2
   },
   "ticks_amount": 20000
 }

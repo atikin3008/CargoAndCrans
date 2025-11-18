@@ -11,9 +11,12 @@ class Event {
  public:
     Event(types::time_t time) : time_(time) {}
 
-    virtual types::EventType getType() = 0;
+    virtual types::EventType getType() const = 0;
 
-    types::time_t getTime();
+    virtual std::shared_ptr<Ship> getShip() const { return nullptr; }
+    virtual std::shared_ptr<Crane> getCrane() const { return nullptr; }
+
+    types::time_t getTime() const;
 
     virtual ~Event() = default;
 
@@ -28,8 +31,12 @@ class ArrivalEvent : public Event {
         : ship_(std::move(ship)), 
         Event(time) {}
 
-    types::EventType getType() override {
+    types::EventType getType() const override {
         return types::EventType::ON_SHIP_ARRIVAL;
+    }
+
+    std::shared_ptr<Ship> getShip() const override {
+        return ship_;
     }
 
  private:
@@ -43,8 +50,16 @@ class InCraneEvent : public Event {
         crane_(std::move(crane)),
         Event(time) {}
 
-    types::EventType getType() override {
+    types::EventType getType() const override {
         return types::EventType::ON_SHIP_IN_CRANE;
+    }
+
+    std::shared_ptr<Ship> getShip() const override {
+        return ship_;
+    }
+
+    std::shared_ptr<Crane> getCrane() const override {
+        return crane_;
     }
 
  private:
@@ -60,8 +75,16 @@ class DepartureEvent : public Event {
         crane_(std::move(crane)),
         Event(time) {}
 
-    types::EventType getType() override {
+    types::EventType getType() const override {
         return types::EventType::ON_SHIP_DEPARTURE;
+    }
+
+    std::shared_ptr<Ship> getShip() const override {
+        return ship_;
+    }
+
+    std::shared_ptr<Crane> getCrane() const override {
+        return crane_;
     }
 
  private:

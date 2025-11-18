@@ -48,3 +48,10 @@ std::vector<std::shared_ptr<Event>> Port::get(){
     return eventLog.getEvents();
 }
 
+const Settings &Port::getSettings() const{
+    return settings;
+}
+
+const std::vector<std::shared_ptr<Crane>> &Port::getCranes() const{
+    return cranes;
+}
