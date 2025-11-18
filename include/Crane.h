@@ -12,7 +12,7 @@ class Crane {
     bool isBusy(types::time_t time);
     std::shared_ptr<Ship> getShip();
     types::CargoType getType();
-    bool shipInCran();
+    bool shipInCrane();
 
  private:
     types::CargoType cargoType_;

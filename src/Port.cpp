@@ -4,10 +4,10 @@
 
 Port::Port(std::string settingsFilename, std::string scheduleFilename) : settings(settingsFilename),
                                                                          schedule(scheduleFilename) {
-    auto cransAmount = settings.get("crans_amount");
-    for (auto &it: cransAmount.as<SettingsNode::object_t>()) {
-        for (int64_t cranIndex = 0; cranIndex < it.second.as<int64_t>(); ++cranIndex) {
-            crans.emplace_back(new Crane(types::getTypeByString(it.first)));
+    auto cranesAmount = settings.get("cranes_amount");
+    for (auto &it: cranesAmount.as<SettingsNode::object_t>()) {
+        for (int64_t craneIndex = 0; craneIndex < it.second.as<int64_t>(); ++craneIndex) {
+            cranes.emplace_back(new Crane(types::getTypeByString(it.first)));
         }
     }
 }
@@ -20,14 +20,14 @@ void Port::process() {
             shipsInOrder.push_back(it.ship);
             eventLog.pushEvent(std::make_shared<ArrivalEvent>(it.ship, tick));
         }
-        for (auto &it2: crans) {
-            if (it2->shipInCran() && !it2->isBusy(tick)){
+        for (auto &it2: cranes) {
+            if (it2->shipInCrane() && !it2->isBusy(tick)){
                 eventLog.pushEvent(std::make_shared<DepartureEvent>(it2->getShip(), it2, tick));
                 it2->addShip(nullptr, 0);
             }
         }
         for (int shipIndex = 0; shipIndex < shipsInOrder.size(); ++shipIndex) {
-            for (auto &it2: crans) {
+            for (auto &it2: cranes) {
                 if (!it2->isBusy(tick) && it2->getType() == shipsInOrder[shipIndex]->cargo_type) {
                     it2->addShip(shipsInOrder[shipIndex], tick);
                     eventLog.pushEvent(std::make_shared<InCraneEvent>(shipsInOrder[shipIndex], it2, tick));

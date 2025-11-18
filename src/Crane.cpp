@@ -33,6 +33,6 @@ std::shared_ptr<Ship> Crane::getShip(){
     return ship_;
 }
 
-bool Crane::shipInCran(){
+bool Crane::shipInCrane(){
     return ship_.get();
 }
