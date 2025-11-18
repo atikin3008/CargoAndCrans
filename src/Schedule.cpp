@@ -109,8 +109,8 @@ namespace schedule {
     std::vector<ScheduleEvent> Schedule::getEvents(types::time_t time) const {
         std::vector<ScheduleEvent> answer;
         for (int i = 0; i < events.size(); i++) {
-            types::time_t seconds = (events[i].arrival_date-1) * 86400 + events[i].arrival_time;
-            if (seconds == time) {
+            types::time_t minutes = (events[i].arrival_date-1) * 1440 + events[i].arrival_time;
+            if (minutes == time) {
                 answer.push_back(events[i]);
             }
         }
