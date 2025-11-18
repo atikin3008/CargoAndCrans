@@ -3,11 +3,11 @@
 
 struct EventTimeLess {
     bool operator()(const std::shared_ptr<Event> &e, types::time_t t) const {
-        return e->getTime() < t;   // или e->time_ < t;
+        return e->getTime() < t;   // same as comparing the raw timestamp
     }
 
     bool operator()(types::time_t t, const std::shared_ptr<Event> &e) const {
-        return t < e->getTime();   // или t < e->time_;
+        return t < e->getTime();   // same as comparing the raw timestamp
     }
 };
 

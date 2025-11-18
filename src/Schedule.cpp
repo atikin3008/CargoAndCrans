@@ -10,25 +10,25 @@ namespace schedule {
         
         int departure_date = arrival_date + planned_stay_days;
         
-        std::cout << "╔══════════════════════════════════════════════════════════════╗\n";
-        std::cout << "║                       SCHEDULE EVENT                        ║\n";
-        std::cout << "╠══════════════════════════════════════════════════════════════╣\n";
-        std::cout << "║  Ship ID:     " << std::setw(42) << std::left << ship->getId() << "║\n";
-        std::cout << "║  Ship Name:   " << std::setw(42) << std::left << ship->getName() << "║\n";
-        std::cout << "║  Cargo Type:  " << std::setw(42) << std::left 
-                << cargoTypeToString(ship->getCargoType()) << "║\n";
-        std::cout << "║  Cargo Weight:" << std::setw(41) << std::left 
-                << std::fixed << std::setprecision(1) << ship->getCargoWeight() << " tonnes║\n";
-        std::cout << "╠══════════════════════════════════════════════════════════════╣\n";
-        std::cout << "║  Arrival Date:  " << std::setw(38) << std::left 
-                << formatDate(arrival_date) << "║\n";
-        std::cout << "║  Arrival Time:  " << std::setw(38) << std::left 
-                << formatTime(hours, minutes) << "║\n";
-        std::cout << "║  Stay Duration: " << std::setw(37) << std::left 
-                << std::to_string(planned_stay_days) + " days" << "║\n";
-        std::cout << "║  Departure:     " << std::setw(38) << std::left 
-                << formatDate(departure_date) << "║\n";
-        std::cout << "╚══════════════════════════════════════════════════════════════╝\n";
+        std::cout << "==============================================================\n";
+        std::cout << "                       SCHEDULE EVENT                        \n";
+        std::cout << "==============================================================\n";
+        std::cout << "  Ship ID:     " << std::setw(42) << std::left << ship->getId() << '\n';
+        std::cout << "  Ship Name:   " << std::setw(42) << std::left << ship->getName() << '\n';
+        std::cout << "  Cargo Type:  " << std::setw(42) << std::left 
+                << cargoTypeToString(ship->getCargoType()) << '\n';
+        std::cout << "  Cargo Weight:" << std::setw(41) << std::left 
+                << std::fixed << std::setprecision(1) << ship->getCargoWeight() << " tonnes\n";
+        std::cout << "--------------------------------------------------------------\n";
+        std::cout << "  Arrival Date:  " << std::setw(38) << std::left 
+                << formatDate(arrival_date) << '\n';
+        std::cout << "  Arrival Time:  " << std::setw(38) << std::left 
+                << formatTime(hours, minutes) << '\n';
+        std::cout << "  Stay Duration: " << std::setw(37) << std::left 
+                << std::to_string(planned_stay_days) + " days" << '\n';
+        std::cout << "  Departure:     " << std::setw(38) << std::left 
+                << formatDate(departure_date) << '\n';
+        std::cout << "==============================================================\n";
         std::cout << std::endl;
     }
 
