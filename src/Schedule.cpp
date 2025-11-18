@@ -75,11 +75,17 @@ namespace schedule {
         return hours * 60 + minutes;
     }
 
-    Schedule::Schedule(const std::string& filename) {
-        Settings settingsFile(filename);
-        auto settings = settingsFile.get("schedule");
+    Schedule::Schedule(const std::string& settingsFilename, const std::string& scheduleFilename) {
+        Settings scheduleSettingsFile(scheduleFilename), settings(settingsFilename);
+        auto scheduleSettings = scheduleSettingsFile.get("schedule");
+
+        int minimum_deviation_of_arrival = settings.get("minimum_deviation_of_arrival").as<int64_t>();
+        int maximum_deviation_of_arrival = settings.get("maximum_deviation_of_arrival").as<int64_t>();
+        int minimum_discharge_deviation = settings.get("minimum_discharge_deviation").as<int64_t>();
+        int maximum_discharge_deviation = settings.get("maximum_discharge_deviation").as<int64_t>();
         
-        for (auto ship_settings : settings.as<SettingsNode::array_t>()) {
+        
+        for (auto ship_settings : scheduleSettings.as<SettingsNode::array_t>()) {
             auto ship = std::make_shared<Ship>(
                 ship_settings.at("ship_id").as<int64_t>(),
                 ship_settings.at("ship_name").as<std::string>(),

@@ -16,7 +16,7 @@ namespace schedule {
     public:
         std::shared_ptr<Ship> ship;              
         int         arrival_date = 0;  
-        types::time_t arrival_time = 0;      
+        types::time_t arrival_time = 0;
         int         planned_stay_days = 0;
 
         ScheduleEvent() = default;
@@ -37,7 +37,7 @@ namespace schedule {
 
     class Schedule {
      public:
-        Schedule(const std::string& filename);
+        Schedule(const std::string& settingsFilename, const std::string& scheduleFilename);
         std::vector<ScheduleEvent> getEvents(types::time_t time) const;
         
      private:
