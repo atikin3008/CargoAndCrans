@@ -15,12 +15,6 @@ class Event {
 
     types::time_t getTime();
 
-    bool operator>(types::time_t time) const;
-
-    bool operator==(types::time_t time) const;
-
-    bool operator<(types::time_t time) const;
-
     virtual ~Event() = default;
 
  private:
@@ -30,7 +24,9 @@ class Event {
 
 class ArrivalEvent : public Event {
  public:
-    ArrivalEvent(std::shared_ptr<Ship> ship, types::time_t time) : ship_(std::move(ship)), Event(time) {}
+    ArrivalEvent(std::shared_ptr<Ship> ship, types::time_t time) 
+        : ship_(std::move(ship)), 
+        Event(time) {}
 
     types::EventType getType() override {
         return types::EventType::ON_SHIP_ARRIVAL;
@@ -42,9 +38,10 @@ class ArrivalEvent : public Event {
 
 class InCraneEvent : public Event {
  public:
-    InCraneEvent(std::shared_ptr<Ship> ship, std::shared_ptr<Crane> crane, types::time_t time) : ship_(std::move(ship)),
-                                                                                              crane_(std::move(crane)),
-                                                                                              Event(time) {}
+    InCraneEvent(std::shared_ptr<Ship> ship, std::shared_ptr<Crane> crane, types::time_t time) 
+        : ship_(std::move(ship)),
+        crane_(std::move(crane)),
+        Event(time) {}
 
     types::EventType getType() override {
         return types::EventType::ON_SHIP_IN_CRANE;
@@ -58,9 +55,10 @@ class InCraneEvent : public Event {
 
 class DepartureEvent : public Event {
  public:
-    DepartureEvent(std::shared_ptr<Ship> ship, std::shared_ptr<Crane> crane, types::time_t time) : ship_(std::move(ship)),
-                                                                                                crane_(std::move(crane)),
-                                                                                                Event(time) {}
+    DepartureEvent(std::shared_ptr<Ship> ship, std::shared_ptr<Crane> crane, types::time_t time) 
+        : ship_(std::move(ship)),
+        crane_(std::move(crane)),
+        Event(time) {}
 
     types::EventType getType() override {
         return types::EventType::ON_SHIP_DEPARTURE;
