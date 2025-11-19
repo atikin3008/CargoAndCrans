@@ -7,6 +7,10 @@
 namespace types{
     typedef uint32_t time_t;
     typedef uint64_t mass_t;
+
+    const time_t MINS_IN_DAY = 1440;
+    const time_t MINS_IN_HOUR = 60;
+
     enum class CargoType{
         BULK,
         LIQUID,

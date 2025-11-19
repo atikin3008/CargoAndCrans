@@ -3,59 +3,8 @@
 
 using json = nlohmann::json;
 
+
 namespace schedule {
-    void ScheduleEvent::print() {
-        int hours = arrival_time / 60;
-        int minutes = arrival_time % 60;
-        
-        int departure_date = arrival_date + planned_stay_days;
-        
-        std::cout << "==============================================================\n";
-        std::cout << "                       SCHEDULE EVENT                        \n";
-        std::cout << "==============================================================\n";
-        std::cout << "  Ship ID:     " << std::setw(42) << std::left << ship->getId() << '\n';
-        std::cout << "  Ship Name:   " << std::setw(42) << std::left << ship->getName() << '\n';
-        std::cout << "  Cargo Type:  " << std::setw(42) << std::left 
-                << cargoTypeToString(ship->getCargoType()) << '\n';
-        std::cout << "  Cargo Weight:" << std::setw(41) << std::left 
-                << std::fixed << std::setprecision(1) << ship->getCargoWeight() << " tonnes\n";
-        std::cout << "--------------------------------------------------------------\n";
-        std::cout << "  Arrival Date:  " << std::setw(38) << std::left 
-                << formatDate(arrival_date) << '\n';
-        std::cout << "  Arrival Time:  " << std::setw(38) << std::left 
-                << formatTime(hours, minutes) << '\n';
-        std::cout << "  Stay Duration: " << std::setw(37) << std::left 
-                << std::to_string(planned_stay_days) + " days" << '\n';
-        std::cout << "  Departure:     " << std::setw(38) << std::left 
-                << formatDate(departure_date) << '\n';
-        std::cout << "==============================================================\n";
-        std::cout << std::endl;
-    }
-
-    std::string ScheduleEvent::cargoTypeToString(types::CargoType type) {
-        switch(type) {
-            case types::CargoType::BULK: return "Bulk";
-            case types::CargoType::CONTAINER: return "Container";
-            case types::CargoType::LIQUID: return "Liquid";
-            default: return "Unknown";
-        }
-    }
-
-    std::string ScheduleEvent::formatDate(int day) {
-        return std::to_string(day);
-    }
-
-    std::string ScheduleEvent::formatTime(int hours, int minutes) {
-        std::string period = (hours < 12) ? "AM" : "PM";
-        int display_hours = (hours == 0 || hours == 12) ? 12 : hours % 12;
-        
-        return (display_hours < 10 ? "0" : "") + std::to_string(display_hours) + ":" +
-            (minutes < 10 ? "0" : "") + std::to_string(minutes) + " " + period;
-    }
-
-
-
-
     types::CargoType Schedule::stringToCargoType(const std::string& type_str) {
         if (type_str == "bulk")      return types::CargoType::BULK;
         if (type_str == "liquid")    return types::CargoType::LIQUID;
@@ -72,7 +21,7 @@ namespace schedule {
         int hours = std::stoi(time_str.substr(0, colon_pos));
         int minutes = std::stoi(time_str.substr(colon_pos + 1));
         
-        return hours * 60 + minutes;
+        return hours * types::MINS_IN_HOUR + minutes;
     }
 
     Schedule::Schedule(const std::string& filename) {
@@ -89,7 +38,7 @@ namespace schedule {
             
             ScheduleEvent se {
                 std::move(ship),
-                ship_settings.at("arrival_date").as<int>(),
+                (ship_settings.at("arrival_date").as<int>()-1) * types::MINS_IN_DAY +
                 parseTime(ship_settings.at("arrival_time").as<std::string>()),
                 ship_settings.at("planned_stay_days").as<int>()
             };
@@ -99,18 +48,14 @@ namespace schedule {
 
         std::sort(events.begin(), events.end(),
                 [](const ScheduleEvent& a, const ScheduleEvent& b) {
-                    if (a.arrival_date == b.arrival_date) {
-                        return a.arrival_time < b.arrival_time;
-                    }
-                    return a.arrival_date < b.arrival_date;
+                    return a.arrival_time < b.arrival_time;
                 });
     }
 
     std::vector<ScheduleEvent> Schedule::getEvents(types::time_t time) const {
         std::vector<ScheduleEvent> answer;
         for (int i = 0; i < events.size(); i++) {
-            types::time_t minutes = (events[i].arrival_date-1) * 1440 + events[i].arrival_time;
-            if (minutes == time) {
+            if (events[i].arrival_time == time) {
                 answer.push_back(events[i]);
             }
         }

@@ -14,25 +14,16 @@
 namespace schedule {
     class ScheduleEvent {
     public:
-        std::shared_ptr<Ship> ship;              
-        int         arrival_date = 0;  
-        types::time_t arrival_time = 0;      
+        std::shared_ptr<Ship> ship;
+        types::time_t arrival_time = 0;
         int         planned_stay_days = 0;
 
         ScheduleEvent() = default;
 
-        ScheduleEvent(std::shared_ptr<Ship> s, int date, types::time_t time, int stay_days)
+        ScheduleEvent(std::shared_ptr<Ship> s, types::time_t time, int stay_days)
             : ship(std::move(s)),
-            arrival_date(date),
             arrival_time(time),
             planned_stay_days(stay_days) {}
-
-        void print();
-
-    private:
-        std::string cargoTypeToString(types::CargoType type);
-        std::string formatDate(int day);
-        std::string formatTime(int hours, int minutes);
     };
 
     class Schedule {
