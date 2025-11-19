@@ -7,6 +7,7 @@
 namespace types{
     typedef uint32_t time_t;
     typedef uint64_t mass_t;
+
     enum class CargoType{
         BULK,
         LIQUID,
