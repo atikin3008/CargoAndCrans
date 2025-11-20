@@ -18,7 +18,7 @@ class PortGUI {
 
   private:
     struct CraneVisual {
-        const Crane *crane = nullptr;
+        std::shared_ptr<Crane> crane = nullptr;
         types::CargoType type{};
         std::size_t orderIndex = 0;
         sf::Vector2f position{};
@@ -76,7 +76,7 @@ class PortGUI {
     std::vector<CraneVisual> craneVisuals_;
     std::map<types::CargoType, LaneMetrics> laneMetrics_;
     std::map<types::CargoType, std::deque<std::shared_ptr<Ship>>> queues_;
-    std::unordered_map<const Crane *, std::size_t> craneIndex_;
+    std::unordered_map<std::shared_ptr<Crane>, std::size_t> craneIndex_;
     std::vector<DepartingShipVisual> departingShips_;
     std::map<types::CargoType, std::size_t> typeTotals_;
     std::map<types::CargoType, std::size_t> actualTypeCounts_;

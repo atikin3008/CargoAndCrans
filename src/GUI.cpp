@@ -109,7 +109,7 @@ void PortGUI::buildLayout() {
 
     for (const auto &crane : cranes) {
         CraneVisual visual;
-        visual.crane = crane.get();
+        visual.crane = crane;
         visual.type = crane->getType();
         visual.orderIndex = counters[visual.type]++;
 
@@ -195,7 +195,7 @@ void PortGUI::handleSimulationEvent(const std::shared_ptr<Event> &event) {
             if (!ship || !crane) {
                 break;
             }
-            auto craneIter = craneIndex_.find(crane.get());
+            auto craneIter = craneIndex_.find(crane);
             if (craneIter != craneIndex_.end()) {
                 craneVisuals_[craneIter->second].currentShip = ship;
             }
@@ -215,7 +215,7 @@ void PortGUI::handleSimulationEvent(const std::shared_ptr<Event> &event) {
             if (!ship || !crane) {
                 break;
             }
-            auto craneIter = craneIndex_.find(crane.get());
+            auto craneIter = craneIndex_.find(crane);
             sf::Vector2f startPosition{};
             if (craneIter != craneIndex_.end()) {
                 CraneVisual &visual = craneVisuals_[craneIter->second];
