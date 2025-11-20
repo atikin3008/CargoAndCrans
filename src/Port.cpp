@@ -3,7 +3,7 @@
 #include<iostream>
 
 Port::Port(std::string settingsFilename, std::string scheduleFilename) : settings(settingsFilename),
-                                                                         schedule(scheduleFilename) {
+                                                                         schedule(settingsFilename, scheduleFilename) {
     auto cranesAmount = settings.get("cranes_amount");
     for (auto &it: cranesAmount.as<SettingsNode::object_t>()) {
         for (int64_t craneIndex = 0; craneIndex < it.second.as<int64_t>(); ++craneIndex) {

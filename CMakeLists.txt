@@ -12,6 +12,7 @@ add_executable(Cargo_and_cranes
     src/Crane.cpp
     src/EventLog.cpp
     src/Event.cpp
+    src/Deviations.cpp
 )
 
 # Поиск nlohmann_json ДО использования
@@ -23,7 +24,7 @@ if(WIN32)
     set(SFML_ROOT "C:/SFML-3.0.2")
     set(SFML_DIR "${SFML_ROOT}/lib/cmake/SFML")
     set(SFML_COMPONENTS Graphics System Window)
-    find_package(SFML 3.0 COMPONENTS ${SFML_COMPONENTS} REQUIRED)
+    find_package(SFML COMPONENTS ${SFML_COMPONENTS} REQUIRED)
     
     # Копирование DLL только для Windows
     add_custom_command(TARGET Cargo_and_cranes POST_BUILD
@@ -53,7 +54,7 @@ elseif(APPLE)
 else()
     # Настройки для Linux и других систем
     set(SFML_COMPONENTS Graphics System Window)
-    find_package(SFML 2.6 COMPONENTS ${SFML_COMPONENTS} REQUIRED)
+    find_package(SFML COMPONENTS ${SFML_COMPONENTS} REQUIRED)
 endif()
 
 # Связывание библиотек
