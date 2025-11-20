@@ -53,7 +53,6 @@ PortGUI::PortGUI(Port &port, const std::string &settingsFile, const std::string 
     if (!events_.empty()) {
         targetTicks_ = std::max(targetTicks_, events_.back()->getTime());
     }
-    std::cout << targetTicks_ << '\n';
 
     for (auto type : typeOrder_) {
         queues_[type] = {};
@@ -123,7 +122,7 @@ void PortGUI::buildLayout() {
         const std::size_t column = visual.orderIndex / kMaxCraneRows;
 
         float x = lane.left + innerOffsetX + column * (craneWidth + craneSpacingX);
-        float y = lane.craneTop + innerOffsetY + row * (craneHeightBox + craneSpacingY);
+        float y = lane.craneTop + innerOffsetY + row * (craneHeightBox + craneSpacingY) + verticalMargin_;
 
         visual.position = {x, y};
         visual.size = {craneWidth, craneHeightBox};
@@ -238,10 +237,13 @@ void PortGUI::handleSimulationEvent(const std::shared_ptr<Event> &event) {
 }
 
 void PortGUI::updateDepartures(float dt) {
+    if (paused_) {
+        return;
+    }
+    
     for (auto &departing : departingShips_) {
         departing.elapsed += dt;
         departing.position += departing.velocity * dt;
-        // Ship slowly drifts downward to mimic perspective.
         departing.position.y += dt * 6.f;
     }
     departingShips_.erase(std::remove_if(departingShips_.begin(), departingShips_.end(),
@@ -323,7 +325,9 @@ void PortGUI::drawCranes(sf::RenderTarget &target) {
 
             std::string shipName = visual.currentShip->getName();
             if (shipName.size() > 14) {
-                shipName = shipName.substr(0, 13) + "…";
+                shipName = shipName.substr(0, 13);
+                shipName.erase(std::remove(shipName.begin(), shipName.end(), ' '), shipName.end());
+                shipName += "...";
             }
             sf::Text shipText = makeText(shipName, 14);
             shipText.setFillColor(sf::Color::Black);
@@ -335,8 +339,8 @@ void PortGUI::drawCranes(sf::RenderTarget &target) {
 }
 
 void PortGUI::drawQueues(sf::RenderTarget &target) {
-    const std::size_t maxSlotsPerRow = 6;
-    const float slotWidth = 70.f;
+    const std::size_t maxSlotsPerRow = 5;
+    const float slotWidth = 78.f;
     const float slotHeight = 28.f;
     const float slotSpacingX = 12.f;
     const float slotSpacingY = 12.f;
@@ -363,7 +367,7 @@ void PortGUI::drawQueues(sf::RenderTarget &target) {
         target.draw(queueText);
 
         const auto &queue = queues_[type];
-        for (std::size_t i = 0; i < queue.size() && i < maxSlotsPerRow * 2; ++i) {
+        for (std::size_t i = 0; i < queue.size() && i < maxSlotsPerRow * 3; ++i) {
             const std::size_t row = i / maxSlotsPerRow;
             const std::size_t column = i % maxSlotsPerRow;
             float x = lane.left + 18.f + column * (slotWidth + slotSpacingX);
@@ -378,7 +382,9 @@ void PortGUI::drawQueues(sf::RenderTarget &target) {
 
             std::string label = queue[i]->getName();
             if (label.size() > 8) {
-                label = label.substr(0, 7) + "…";
+                label = label.substr(0, 7);
+                label.erase(std::remove(label.begin(), label.end(), ' '), label.end());
+                label += "...";
             }
             sf::Text slotText = makeText(label, 13);
             slotText.setFillColor(sf::Color::Black);
@@ -398,15 +404,13 @@ void PortGUI::drawDepartingShips(sf::RenderTarget &target) {
         color.a = static_cast<std::uint8_t>(alpha * 255);
         hull.setFillColor(color);
         hull.setOutlineColor(sf::Color(255, 255, 255,
-                                       static_cast<std::uint8_t>(std::max(0.f, alpha) * 200.f)));
+                                       static_cast<std::uint8_t>(alpha * 200.f)));
         hull.setOutlineThickness(1.4f);
         target.draw(hull);
 
         if (ship.ship) {
             std::string label = ship.ship->getName();
-            if (label.size() > 10) {
-                label = label.substr(0, 9) + "…";
-            }
+            
             sf::Text shipText = makeText(label, 14);
             shipText.setFillColor(
                 sf::Color(240, 240, 240, static_cast<std::uint8_t>(alpha * 255)));

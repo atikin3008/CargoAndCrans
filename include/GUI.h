@@ -65,8 +65,8 @@ class PortGUI {
     const float verticalMargin_ = 30.f;
     const float columnSpacing_ = 42.f;
     const float topBarHeight_ = 84.f;
-    const float queueHeight_ = 160.f;
-    static constexpr std::size_t kMaxCraneRows = 8;
+    const float queueHeight_ = 200.f;
+    static constexpr std::size_t kMaxCraneRows = 7;
 
     Port &port_;
     Settings settings_;
