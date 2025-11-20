@@ -54,6 +54,7 @@ namespace schedule {
 
         std::sort(events.begin(), events.end(),
                 [](const ScheduleEvent& a, const ScheduleEvent& b) {
+                    
                     return a.arrival_time < b.arrival_time;
                 });
     }

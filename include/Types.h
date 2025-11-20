@@ -49,4 +49,16 @@ namespace types{
             return CargoType::CONTAINER;
         throw std::runtime_error("Bad type name");
     }
+
+    inline std::string cargoToString(const types::CargoType& type) {
+    switch (type) {
+        case types::CargoType::BULK:
+            return "Bulk";
+        case types::CargoType::LIQUID:
+            return "Liquid";
+        case types::CargoType::CONTAINER:
+            return "Container";
+    }
+    return "Unknown";
+}
 }

@@ -55,7 +55,6 @@ class PortGUI {
     void drawDepartingShips(sf::RenderTarget &target);
     void drawOverlay(sf::RenderTarget &target);
     sf::Color colorForCargo(types::CargoType type, float alpha = 1.f) const;
-    std::string cargoToString(types::CargoType type) const;
     sf::Text makeText(const std::string &text, unsigned size) const;
     sf::Vector2f craneCenter(const CraneVisual &visual) const;
     void adjustTimeScale(int direction);

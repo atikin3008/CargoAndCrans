@@ -19,7 +19,7 @@ std::map<types::CargoType, std::size_t> readCraneTotals(const Settings &settings
     for (types::CargoType type : {types::CargoType::BULK, types::CargoType::LIQUID, types::CargoType::CONTAINER}) {
         if (!totals.contains(type)) {
             totals[type] = 0;
-        }
+        }  
     }
     return totals;
 }
@@ -50,12 +50,20 @@ PortGUI::PortGUI(Port &port, const std::string &settingsFile, const std::string 
     events_ = port_.get();
     std::sort(events_.begin(), events_.end(),
               [](const std::shared_ptr<Event> &lhs, const std::shared_ptr<Event> &rhs) {
-                  return lhs->getTime() < rhs->getTime();
+                if (lhs->getTime() == rhs->getTime()) {
+                    std::map<types::EventType, int> cmp{
+                        {types::EventType::ON_SHIP_ARRIVAL, 0},
+                        {types::EventType::ON_SHIP_IN_CRANE, 1}, 
+                        {types::EventType::ON_SHIP_DEPARTURE, 2}};
+                    return cmp[lhs->getType()] < cmp[rhs->getType()];
+                }
+                return lhs->getTime() < rhs->getTime();
               });
     targetTicks_ = settings_.get("ticks_amount").as<int64_t>();
     if (!events_.empty()) {
         targetTicks_ = std::max(targetTicks_, events_.back()->getTime());
     }
+    std::cout << targetTicks_ << '\n';
 
     for (auto type : typeOrder_) {
         queues_[type] = {};
@@ -289,7 +297,7 @@ void PortGUI::drawCranes(sf::RenderTarget &target) {
         std::ostringstream label;
         const auto totalConfigured = typeTotals_.contains(type) ? typeTotals_.at(type) : 0;
         const auto totalActive = actualTypeCounts_.contains(type) ? actualTypeCounts_.at(type) : 0;
-        label << cargoToString(type) << " cranes  busy " << busyCount[type] << "/" << totalActive
+        label << types::cargoToString(type) << " cranes  busy " << busyCount[type] << "/" << totalActive
               << "  configured " << totalConfigured;
         sf::Text labelText = makeText(label.str(), 20);
         labelText.setFillColor(sf::Color::White);
@@ -489,18 +497,6 @@ sf::Color PortGUI::colorForCargo(types::CargoType type, float alpha) const {
     }
     base.a = static_cast<std::uint8_t>(alpha * 255);
     return base;
-}
-
-std::string PortGUI::cargoToString(types::CargoType type) const {
-    switch (type) {
-        case types::CargoType::BULK:
-            return "Bulk";
-        case types::CargoType::LIQUID:
-            return "Liquid";
-        case types::CargoType::CONTAINER:
-            return "Container";
-    }
-    return "Unknown";
 }
 
 sf::Text PortGUI::makeText(const std::string &text, unsigned size) const {
