@@ -48,17 +48,7 @@ PortGUI::PortGUI(Port &port, const std::string &settingsFile, const std::string 
     typeTotals_ = readCraneTotals(settings_);
 
     events_ = port_.get();
-    std::sort(events_.begin(), events_.end(),
-              [](const std::shared_ptr<Event> &lhs, const std::shared_ptr<Event> &rhs) {
-                if (lhs->getTime() == rhs->getTime()) {
-                    std::map<types::EventType, int> cmp{
-                        {types::EventType::ON_SHIP_ARRIVAL, 0},
-                        {types::EventType::ON_SHIP_IN_CRANE, 1}, 
-                        {types::EventType::ON_SHIP_DEPARTURE, 2}};
-                    return cmp[lhs->getType()] < cmp[rhs->getType()];
-                }
-                return lhs->getTime() < rhs->getTime();
-              });
+
     targetTicks_ = settings_.get("ticks_amount").as<int64_t>();
     if (!events_.empty()) {
         targetTicks_ = std::max(targetTicks_, events_.back()->getTime());
