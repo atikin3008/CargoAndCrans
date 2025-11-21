@@ -14,7 +14,7 @@ void Crane::addShip(const std::shared_ptr<Ship> &ship, types::time_t time) {
     if (end_ > time)
         throw std::runtime_error("Ship is not unloaded");
     ship_ = ship;
-    end_ = time + (types::time_t) std::ceil(ship->cargo_weight_tonnes / types::getSpeedOfUnloadCargo(ship->cargo_type));
+    end_ = time + (types::time_t) std::ceil(ship->cargo_weight_tonnes / types::getSpeedOfUnloadCargo(ship->cargo_type)) + Deviations::GetInstance()->getDischargeDeviation();
 }
 
 bool Crane::isBusy(types::time_t time) {

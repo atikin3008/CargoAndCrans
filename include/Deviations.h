@@ -35,7 +35,7 @@ class Deviations {
 
     void operator=(const Deviations &) = delete;
 
-    static Deviations *GetInstance(const std::string &settingsFilename);
+    static Deviations *GetInstance();
 
     int64_t getDeviationOfArival();
 

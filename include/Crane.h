@@ -3,6 +3,7 @@
 #include "Types.h"
 #include "Ship.h"
 #include<memory>
+#include "Deviations.h"
 
 
 class Crane {

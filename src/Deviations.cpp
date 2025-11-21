@@ -3,10 +3,10 @@
 
 Deviations *Deviations::singleton_ = nullptr;
 
-Deviations *Deviations::GetInstance(const std::string &value) {
+Deviations *Deviations::GetInstance() {
 
     if (singleton_ == nullptr) {
-        singleton_ = new Deviations(value);
+        singleton_ = new Deviations("settings.json");
     }
     return singleton_;
 }
