@@ -85,7 +85,7 @@ class PortGUI {
 
     float simTime_ = 0.f;
     std::size_t nextEventIndex_ = 0;
-    float timeScale_ = 240.f;
+    float timeScale_ = 240000.f;
     bool paused_ = false;
     types::time_t targetTicks_ = 0;
 };

@@ -1,6 +1,7 @@
 #include "../include/Port.h"
 #include "../include/Types.h"
-#include<iostream>
+#include <algorithm>
+#include <iostream>
 
 Port::Port(std::string settingsFilename, std::string scheduleFilename) : settings(settingsFilename),
                                                                          schedule(settingsFilename, scheduleFilename) {
@@ -14,29 +15,54 @@ Port::Port(std::string settingsFilename, std::string scheduleFilename) : setting
 
 
 void Port::process() {
-    types::time_t ticksAmount = settings.get("ticks_amount").as<int64_t>();
-    for (int tick = 0; tick < ticksAmount; ++tick) {
-        for (auto &it: schedule.getEvents(tick)) {
-            shipsInOrder.push_back(it.ship);
-            eventLog.pushEvent(std::make_shared<ArrivalEvent>(it.ship, tick));
+    const auto allScheduleEvents = schedule.getEvents();
+    const types::time_t lastArrival =
+        allScheduleEvents.empty() ? 0 : allScheduleEvents.back().arrival_time;
+
+    types::time_t ticksAmount =
+        std::max<int64_t>(settings.get("ticks_amount").as<int64_t>(), lastArrival) + 10;
+
+    auto processTick = [&](types::time_t tick) {
+        for (auto &event : schedule.getEvents(tick)) {
+            shipsInOrder.push_back(event.ship);
+            eventLog.pushEvent(std::make_shared<ArrivalEvent>(event.ship, tick));
         }
-        for (auto &it2: cranes) {
-            if (it2->shipInCrane() && !it2->isBusy(tick)){
-                eventLog.pushEvent(std::make_shared<DepartureEvent>(it2->getShip(), it2, tick));
-                it2->addShip(nullptr, 0);
+
+        for (auto &crane : cranes) {
+            if (crane->shipInCrane() && !crane->isBusy(tick)) {
+                eventLog.pushEvent(std::make_shared<DepartureEvent>(crane->getShip(), crane, tick));
+                crane->addShip(nullptr, 0);
             }
         }
-        for (int shipIndex = 0; shipIndex < shipsInOrder.size(); ++shipIndex) {
-            for (auto &it2: cranes) {
-                if (!it2->isBusy(tick) && it2->getType() == shipsInOrder[shipIndex]->cargo_type) {
-                    it2->addShip(shipsInOrder[shipIndex], tick);
-                    eventLog.pushEvent(std::make_shared<InCraneEvent>(shipsInOrder[shipIndex], it2, tick));
+
+        for (int shipIndex = 0; shipIndex < static_cast<int>(shipsInOrder.size()); ++shipIndex) {
+            for (auto &crane : cranes) {
+                if (!crane->isBusy(tick) && crane->getType() == shipsInOrder[shipIndex]->cargo_type) {
+                    crane->addShip(shipsInOrder[shipIndex], tick);
+                    eventLog.pushEvent(std::make_shared<InCraneEvent>(shipsInOrder[shipIndex], crane, tick));
                     shipsInOrder.erase(shipsInOrder.begin() + shipIndex);
                     --shipIndex;
                     break;
                 }
             }
         }
+    };
+
+    types::time_t tick = 0;
+    for (; tick < ticksAmount; ++tick) {
+        processTick(tick);
+    }
+
+    auto pendingWork = [&]() {
+        if (!shipsInOrder.empty()) {
+            return true;
+        }
+        return std::any_of(cranes.begin(), cranes.end(),
+                           [](const std::shared_ptr<Crane> &crane) { return crane->shipInCrane(); });
+    };
+
+    while (pendingWork()) {
+        processTick(tick++);
     }
 }
 

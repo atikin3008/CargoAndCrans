@@ -67,5 +67,9 @@ namespace schedule {
         }
         return answer;
     }
+    std::vector<ScheduleEvent> Schedule::getEvents() const
+    {
+        return events;
+    }
 
 } // namespace schedule

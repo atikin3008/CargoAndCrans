@@ -31,9 +31,9 @@ namespace schedule {
      public:
         Schedule(const std::string& settingsFilename, const std::string& scheduleFilename);
         std::vector<ScheduleEvent> getEvents(types::time_t time) const;
-        
-     private:
-        std::vector<ScheduleEvent> events;
+        std::vector<ScheduleEvent> getEvents() const;
+
+        private : std::vector<ScheduleEvent> events;
 
         static types::CargoType stringToCargoType(const std::string& type_str);
         static types::time_t parseTime(const std::string& time_str);
