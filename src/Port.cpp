@@ -17,7 +17,7 @@ void Port::process() {
     types::time_t ticksAmount = settings.get("ticks_amount").as<int64_t>();
     for (int tick = 0; tick < ticksAmount; ++tick) {
         for (auto &it: schedule.getEvents(tick)) {
-            shipsInOrder.push_back(it.ship);
+            shipsInOrder.push_back(it);
             eventLog.pushEvent(std::make_shared<ArrivalEvent>(it.ship, tick));
         }
         for (auto &it2: cranes) {
@@ -28,9 +28,9 @@ void Port::process() {
         }
         for (int shipIndex = 0; shipIndex < shipsInOrder.size(); ++shipIndex) {
             for (auto &it2: cranes) {
-                if (!it2->isBusy(tick) && it2->getType() == shipsInOrder[shipIndex]->cargo_type) {
-                    it2->addShip(shipsInOrder[shipIndex], tick);
-                    eventLog.pushEvent(std::make_shared<InCraneEvent>(shipsInOrder[shipIndex], it2, tick));
+                if (!it2->isBusy(tick) && it2->getType() == shipsInOrder[shipIndex].ship->cargo_type) {
+                    it2->addShip(shipsInOrder[shipIndex].ship, tick);
+                    eventLog.pushEvent(std::make_shared<InCraneEvent>(shipsInOrder[shipIndex].ship, it2, tick));
                     shipsInOrder.erase(shipsInOrder.begin() + shipIndex);
                     --shipIndex;
                     break;

@@ -7,6 +7,7 @@
 #include<vector>
 #include<memory>
 #include<string>
+#include
 
 class Port{
     public:
@@ -20,6 +21,6 @@ class Port{
     EventLog eventLog;
     schedule::Schedule schedule;
     Settings settings;
-    std::vector<std::shared_ptr<Ship>> shipsInOrder;
+    std::vector<schedule::ScheduleEvent> shipsInOrder;
     std::vector<std::shared_ptr<Crane>> cranes;
 };
