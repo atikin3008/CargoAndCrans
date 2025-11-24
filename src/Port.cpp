@@ -1,6 +1,7 @@
 #include "../include/Port.h"
 #include "../include/Types.h"
 #include<iostream>
+#include"../include/Statistics.h"
 
 Port::Port(std::string settingsFilename, std::string scheduleFilename) : settings(settingsFilename),
                                                                          schedule(settingsFilename, scheduleFilename) {
@@ -23,7 +24,10 @@ void Port::process() {
         for (auto &it2: cranes) {
             if (it2->shipInCrane() && !it2->isBusy(tick)){
                 eventLog.pushEvent(std::make_shared<DepartureEvent>(it2->getShip(), it2, tick));
-                it2->addShip(nullptr, 0);
+                Statistics::getInstance()->addMass(it2->getShip()->cargo_weight_tonnes);
+                Statistics::getInstance()->addShip();
+
+                it2->addShip({}, -1);
             }
         }
         for (int shipIndex = 0; shipIndex < shipsInOrder.size(); ++shipIndex) {

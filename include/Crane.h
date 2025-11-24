@@ -4,12 +4,13 @@
 #include "Ship.h"
 #include<memory>
 #include "Deviations.h"
+#include"Schedule.h"
 
 
 class Crane {
  public:
     Crane(types::CargoType cargoType);
-    void addShip(const std::shared_ptr<Ship>& ship, types::time_t time);
+    void addShip(const schedule::ScheduleEvent & event, types::time_t time);
     bool isBusy(types::time_t time);
     std::shared_ptr<Ship> getShip();
     types::CargoType getType();

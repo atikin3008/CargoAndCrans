@@ -1,20 +1,26 @@
 #include "../include/Crane.h"
 #include <cmath>
+#include"../include/statistics.h"
 
 Crane::Crane(types::CargoType type) : cargoType_(type), ship_(nullptr), end_(0) {}
 
-void Crane::addShip(const std::shared_ptr<Ship> &ship, types::time_t time) {
-    if(!ship){
+void Crane::addShip(const schedule::ScheduleEvent &event, types::time_t time) {
+    if (time == -1) {
         ship_ = nullptr;
         end_ = 0;
         return;
     }
-    if (ship->cargo_type != cargoType_)
+    if (event.ship->cargo_type != cargoType_)
         throw std::runtime_error("Types are not equal");
     if (end_ > time)
         throw std::runtime_error("Ship is not unloaded");
-    ship_ = ship;
-    end_ = time + (types::time_t) std::ceil(ship->cargo_weight_tonnes / types::getSpeedOfUnloadCargo(ship->cargo_type)) + Deviations::GetInstance()->getDischargeDeviation();
+    ship_ = event.ship;
+    end_ = time +
+           (types::time_t) std::ceil(
+                   event.ship->cargo_weight_tonnes / types::getSpeedOfUnloadCargo(event.ship->cargo_type)) +
+           Deviations::GetInstance()->getDischargeDeviation();
+    Statistics::getInstance()->addFine(
+            std::max<types::time_t>(0, end_ - (event.arrivalTime + event.plannedStayDays * types::MINS_IN_DAY)));
 }
 
 bool Crane::isBusy(types::time_t time) {
@@ -29,10 +35,10 @@ types::CargoType Crane::getType() {
     return cargoType_;
 }
 
-std::shared_ptr<Ship> Crane::getShip(){
+std::shared_ptr<Ship> Crane::getShip() {
     return ship_;
 }
 
-bool Crane::shipInCrane(){
+bool Crane::shipInCrane() {
     return ship_.get();
 }
