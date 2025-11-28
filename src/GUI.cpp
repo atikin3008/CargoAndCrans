@@ -1,4 +1,5 @@
 #include "../include/GUI.h"
+#include "../include/Statistics.h"
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Window/Event.hpp>
 #include <algorithm>
@@ -443,6 +444,38 @@ void PortGUI::drawOverlay(sf::RenderTarget &target) {
     sf::Text speedText = makeText(speedStream.str(), 20);
     speedText.setPosition(sf::Vector2f{horizontalMargin_ + 280.f, 44.f});
     target.draw(speedText);
+
+    const auto stats = Statistics::getInstance()->getStatistics();
+    const auto statValue = [&](const std::string &key) -> std::int64_t {
+        const auto it = stats.find(key);
+        return it != stats.end() ? static_cast<std::int64_t>(it->second) : 0;
+    };
+
+    const float statsWidth = 380.f;
+    const float statsHeight = 56.f;
+    const float statsLeft = windowWidth_ - horizontalMargin_ - statsWidth;
+    const float statsTop = 10.f;
+
+    sf::RectangleShape statsPanel({statsWidth, statsHeight});
+    statsPanel.setPosition(sf::Vector2f{statsLeft, statsTop});
+    statsPanel.setFillColor(sf::Color(16, 28, 48, 190));
+    statsPanel.setOutlineColor(sf::Color(45, 60, 80, 220));
+    statsPanel.setOutlineThickness(1.4f);
+    target.draw(statsPanel);
+
+    std::ostringstream cargoStats;
+    cargoStats << "Ships: " << statValue("SHIPS") << "    Cargo: " << statValue("MASS") << " t";
+    sf::Text cargoText = makeText(cargoStats.str(), 16);
+    cargoText.setPosition(sf::Vector2f{statsLeft + 10.f, statsTop + 12.f});
+    cargoText.setFillColor(sf::Color(220, 230, 245));
+    target.draw(cargoText);
+
+    std::ostringstream fineStats;
+    fineStats << "Penalty time: " << statValue("FINE") << " min";
+    sf::Text fineText = makeText(fineStats.str(), 16);
+    fineText.setPosition(sf::Vector2f{statsLeft + 10.f, statsTop + 32.f});
+    fineText.setFillColor(sf::Color(220, 230, 245));
+    target.draw(fineText);
 
     sf::Text instructionText =
         makeText("Space: pause/resume   Up/Down: change speed   Esc: exit", 16);

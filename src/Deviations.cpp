@@ -6,7 +6,7 @@ Deviations *Deviations::singleton_ = nullptr;
 Deviations *Deviations::GetInstance() {
 
     if (singleton_ == nullptr) {
-        singleton_ = new Deviations("settings.json");
+        singleton_ = new Deviations("../settings.json");
     }
     return singleton_;
 }

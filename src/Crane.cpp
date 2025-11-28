@@ -1,6 +1,6 @@
 #include "../include/Crane.h"
 #include <cmath>
-#include"../include/statistics.h"
+#include"../include/Statistics.h"
 
 Crane::Crane(types::CargoType type) : cargoType_(type), ship_(nullptr), end_(0) {}
 

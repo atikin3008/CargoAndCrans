@@ -33,7 +33,7 @@ void Port::process() {
         for (int shipIndex = 0; shipIndex < shipsInOrder.size(); ++shipIndex) {
             for (auto &it2: cranes) {
                 if (!it2->isBusy(tick) && it2->getType() == shipsInOrder[shipIndex].ship->cargo_type) {
-                    it2->addShip(shipsInOrder[shipIndex].ship, tick);
+                    it2->addShip(shipsInOrder[shipIndex], tick);
                     eventLog.pushEvent(std::make_shared<InCraneEvent>(shipsInOrder[shipIndex].ship, it2, tick));
                     shipsInOrder.erase(shipsInOrder.begin() + shipIndex);
                     --shipIndex;

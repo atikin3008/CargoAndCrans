@@ -13,6 +13,7 @@ add_executable(Cargo_and_cranes
     src/EventLog.cpp
     src/Event.cpp
     src/Deviations.cpp
+    src/Statistics.cpp
 )
 
 # Поиск nlohmann_json ДО использования
