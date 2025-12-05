@@ -4,7 +4,7 @@
     "LIQUID": 2,
     "CONTAINER": 2
   },
-  "ticks_amount": 2000000,
+  "ticks_amount": 2000,
   "minimum_deviation_of_arrival" : -6,
   "maximum_deviation_of_arrival" : 5,
   "minimum_discharge_deviation" : -3,
