@@ -70,6 +70,14 @@ target_link_libraries(Cargo_and_cranes
     SFML::System
 )
 
+add_executable(Cargo_menu
+    src/Menu.cpp
+)
+
+target_link_libraries(Cargo_menu
+    Qt6::Widgets
+)
+
 add_executable(CargoEditor
     src/editor/main.cpp
     src/editor/EditorWindow.cpp

@@ -34,6 +34,7 @@ namespace schedule {
         Schedule(const std::string &settingsFilename, const std::string &scheduleFilename);
 
         std::vector<ScheduleEvent> getEvents(types::time_t time) const;
+        std::vector<ScheduleEvent> getEvents() const;
 
      private:
         std::vector<ScheduleEvent> events;
