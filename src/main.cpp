@@ -43,6 +43,11 @@ int main(int /*argc*/, char **argv) {
 
         Port port(settingsFile, scheduleFile);
         port.process();
+        for(auto &it : port.get()){
+            if(it->getShip()->getName().starts_with("Aurora Spirit")){
+                std::cout << it->getShip()->getId()  <<"  "<< types::getStringByEventType(it->getType()) << " " << it->getTime() << "\n";
+            }
+        }
 
         PortGUI gui(port, settingsFile, fontPath);
         gui.run();

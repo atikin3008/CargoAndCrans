@@ -1,220 +1,94 @@
 {
-  "schedule": [
-    {
-      "ship_id": 1,
-      "ship_name": "Atlant",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "bulk",
-      "cargo_weight_tonnes": 15000,
-      "planned_stay_days": 4
-    },
-    {
-      "ship_id": 2,
-      "ship_name": "Neftyanoi Potok",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "liquid",
-      "cargo_weight_tonnes": 50000,
-      "planned_stay_days": 3
-    },
-    {
-      "ship_id": 3,
-      "ship_name": "Vostochny Container",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "container",
-      "cargo_weight_tonnes": 20000,
-      "planned_stay_days": 5
-    },
-    {
-      "ship_id": 4,
-      "ship_name": "Zernoroy",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "bulk",
-      "cargo_weight_tonnes": 10000,
-      "planned_stay_days": 2
-    },
-    {
-      "ship_id": 5,
-      "ship_name": "Yantar",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "liquid",
-      "cargo_weight_tonnes": 30000,
-      "planned_stay_days": 4
-    },
-    {
-      "ship_id": 6,
-      "ship_name": "Vostok Marine",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "container",
-      "cargo_weight_tonnes": 12000,
-      "planned_stay_days": 3
-    },
-    {
-      "ship_id": 7,
-      "ship_name": "Olga Maru",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "bulk",
-      "cargo_weight_tonnes": 25000,
-      "planned_stay_days": 2
-    },
-    {
-      "ship_id": 8,
-      "ship_name": "Zarya",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "liquid",
-      "cargo_weight_tonnes": 40000,
-      "planned_stay_days": 5
-    },
-    {
-      "ship_id": 9,
-      "ship_name": "Sergei Rybakov",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "container",
-      "cargo_weight_tonnes": 30000,
-      "planned_stay_days": 3
-    },
-    {
-      "ship_id": 10,
-      "ship_name": "Mariner Pro",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "bulk",
-      "cargo_weight_tonnes": 50000,
-      "planned_stay_days": 4
-    },
-    {
-      "ship_id": 11,
-      "ship_name": "Atlantic Voyager",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "liquid",
-      "cargo_weight_tonnes": 15000,
-      "planned_stay_days": 2
-    },
-    {
-      "ship_id": 12,
-      "ship_name": "Olympus",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "container",
-      "cargo_weight_tonnes": 22000,
-      "planned_stay_days": 3
-    },
-    {
-      "ship_id": 13,
-      "ship_name": "Elbrus",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "bulk",
-      "cargo_weight_tonnes": 28000,
-      "planned_stay_days": 4
-    },
-    {
-      "ship_id": 14,
-      "ship_name": "Polar Star",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "liquid",
-      "cargo_weight_tonnes": 40000,
-      "planned_stay_days": 2
-    },
-    {
-      "ship_id": 15,
-      "ship_name": "Odyssey",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "container",
-      "cargo_weight_tonnes": 15000,
-      "planned_stay_days": 3
-    },
-    {
-      "ship_id": 16,
-      "ship_name": "Pioneer",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "bulk",
-      "cargo_weight_tonnes": 25000,
-      "planned_stay_days": 2
-    },
-    {
-      "ship_id": 17,
-      "ship_name": "Argonaut",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "liquid",
-      "cargo_weight_tonnes": 20000,
-      "planned_stay_days": 5
-    },
-    {
-      "ship_id": 18,
-      "ship_name": "Viking Queen",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "container",
-      "cargo_weight_tonnes": 30000,
-      "planned_stay_days": 3
-    },
-    {
-      "ship_id": 19,
-      "ship_name": "Aurora Express",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "bulk",
-      "cargo_weight_tonnes": 18000,
-      "planned_stay_days": 2
-    },
-    {
-      "ship_id": 20,
-      "ship_name": "Antarctica Trader",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "liquid",
-      "cargo_weight_tonnes": 40000,
-      "planned_stay_days": 4
-    },
-    {
-      "ship_id": 21,
-      "ship_name": "Sunrise",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "container",
-      "cargo_weight_tonnes": 25000,
-      "planned_stay_days": 3
-    },
-    {
-      "ship_id": 22,
-      "ship_name": "Endeavour",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "bulk",
-      "cargo_weight_tonnes": 22000,
-      "planned_stay_days": 2
-    },
-    {
-      "ship_id": 23,
-      "ship_name": "Discovery",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "liquid",
-      "cargo_weight_tonnes": 30000,
-      "planned_stay_days": 3
-    },
-    {
-      "ship_id": 24,
-      "ship_name": "Odyssey Horizon",
-      "arrival_date": 1,
-      "arrival_time": "00:00",
-      "cargo_type": "container",
-      "cargo_weight_tonnes": 15000,
-      "planned_stay_days": 5
-    }
-  ]
+    "schedule": [
+        {
+            "arrival_date": 3,
+            "arrival_time": "03:04",
+            "cargo_type": "liquid",
+            "cargo_weight_tonnes": 53984,
+            "planned_stay_days": 3,
+            "ship_id": 10,
+            "ship_name": "Ocean Carrier"
+        },
+        {
+            "arrival_date": 3,
+            "arrival_time": "09:56",
+            "cargo_type": "bulk",
+            "cargo_weight_tonnes": 13867,
+            "planned_stay_days": 4,
+            "ship_id": 8,
+            "ship_name": "Aurora Carrier"
+        },
+        {
+            "arrival_date": 4,
+            "arrival_time": "00:25",
+            "cargo_type": "container",
+            "cargo_weight_tonnes": 20569,
+            "planned_stay_days": 1,
+            "ship_id": 2,
+            "ship_name": "Northern Trader"
+        },
+        {
+            "arrival_date": 4,
+            "arrival_time": "10:09",
+            "cargo_type": "bulk",
+            "cargo_weight_tonnes": 35906,
+            "planned_stay_days": 2,
+            "ship_id": 9,
+            "ship_name": "Eastern Voyager"
+        },
+        {
+            "arrival_date": 5,
+            "arrival_time": "01:36",
+            "cargo_type": "container",
+            "cargo_weight_tonnes": 14753,
+            "planned_stay_days": 7,
+            "ship_id": 1,
+            "ship_name": "Grand Navigator"
+        },
+        {
+            "arrival_date": 5,
+            "arrival_time": "13:44",
+            "cargo_type": "container",
+            "cargo_weight_tonnes": 9167,
+            "planned_stay_days": 5,
+            "ship_id": 5,
+            "ship_name": "Northern Express"
+        },
+        {
+            "arrival_date": 8,
+            "arrival_time": "09:24",
+            "cargo_type": "container",
+            "cargo_weight_tonnes": 14834,
+            "planned_stay_days": 6,
+            "ship_id": 6,
+            "ship_name": "Grand Star"
+        },
+        {
+            "arrival_date": 8,
+            "arrival_time": "16:53",
+            "cargo_type": "container",
+            "cargo_weight_tonnes": 38560,
+            "planned_stay_days": 1,
+            "ship_id": 3,
+            "ship_name": "Ocean Voyager"
+        },
+        {
+            "arrival_date": 9,
+            "arrival_time": "16:19",
+            "cargo_type": "liquid",
+            "cargo_weight_tonnes": 25171,
+            "planned_stay_days": 1,
+            "ship_id": 7,
+            "ship_name": "Atlantic Carrier"
+        },
+        {
+            "arrival_date": 9,
+            "arrival_time": "18:31",
+            "cargo_type": "bulk",
+            "cargo_weight_tonnes": 19881,
+            "planned_stay_days": 2,
+            "ship_id": 4,
+            "ship_name": "Northern Navigator"
+        }
+    ]
 }

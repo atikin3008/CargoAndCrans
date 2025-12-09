@@ -52,7 +52,7 @@ PortGUI::PortGUI(Port &port, const std::string &settingsFile, const std::string 
 
     targetTicks_ = settings_.get("ticks_amount").as<int64_t>();
     if (!events_.empty()) {
-        targetTicks_ = std::max(targetTicks_, events_.back()->getTime());
+        targetTicks_ = std::max(targetTicks_, events_.back()->getTime()) + 10;
     }
 
     for (auto type : typeOrder_) {
@@ -543,5 +543,5 @@ void PortGUI::adjustTimeScale(int direction) {
         return;
     }
     const float delta = direction > 0 ? 60.f : -60.f;
-    timeScale_ = std::clamp(timeScale_ + delta, 30.f, 1200.f);
+    timeScale_ = std::clamp(timeScale_ + delta, 30.f, 120000.f);
 }

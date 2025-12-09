@@ -2,6 +2,7 @@
 #include "../include/Types.h"
 #include<iostream>
 #include"../include/Statistics.h"
+#include <algorithm>
 
 Port::Port(std::string settingsFilename, std::string scheduleFilename) : settings(settingsFilename),
                                                                          schedule(settingsFilename, scheduleFilename) {
