@@ -1,0 +1,125 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{longtable}
+\geometry{margin=2.3cm}
+
+\title{Cargo\_and\_crans \\ Руководство пользователя и программиста}
+\author{Команда разработки}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Общее описание}
+Симулятор работы порта \textbf{Cargo\_and\_crans} моделирует прибытие судов, их распределение по кранам и выгрузку грузов. В комплекте есть визуализация на SFML, отображающая очередь, занятые краны, отлетающие корабли и финальный полноэкранный экран статистики после завершения симуляции (обслуженные суда, суммарный тоннаж, штрафное время/штраф).
+
+\subsection*{Основные возможности}
+\begin{itemize}[noitemsep]
+    \item Чтение расписания судов из \verb|schedule.json|.
+    \item Настройка количества кранов и времени моделирования через \verb|settings.json|.
+    \item Стохастические отклонения прибытия и времени выгрузки.
+    \item Визуализация процесса и вывод статистики.
+\end{itemize}
+
+\section{Руководство пользователя}
+\subsection{Требования}
+\begin{itemize}[noitemsep]
+    \item CMake 3.26+, компилятор C++20.
+    \item SFML 3 (Graphics, Window, System), nlohmann\_json (3.11.2+).
+    \item Для запуска GUI требуется доступ к графическому экрану.
+\end{itemize}
+
+\subsection{Сборка}
+\begin{enumerate}[noitemsep]
+    \item \verb|cmake -S . -B build|
+    \item \verb|cmake --build build|
+\end{enumerate}
+Бинарь появится в \verb|build/Cargo_and_cranes| (CLion использует свою папку \verb|cmake-build-...|).
+
+\subsection{Запуск}
+\begin{verbatim}
+./build/Cargo_and_cranes
+\end{verbatim}
+Программа ищет ресурсы \verb|settings.json|, \verb|schedule.json| и шрифт \verb|fonts/DejaVuSans.ttf| в следующих местах: текущая директория запуска, папка с бинарём, родительская папка бинаря. Это упрощает запуск из IDE и из собранной папки.
+
+\subsection{Управление в окне симуляции}
+\begin{itemize}[noitemsep]
+    \item \textbf{Space} — пауза/продолжить.
+    \item \textbf{Up/Down} — увеличить/уменьшить скорость (ticks/sec).
+    \item \textbf{Esc} — выход.
+    \item Кнопки внизу окна (мышью): \texttt{Restart}, \texttt{-1 day}, \texttt{-1 hour}, \texttt{Play/Pause}, \texttt{+1 hour}, \texttt{+1 day}, \texttt{To end} — перемотка по времени и быстрый переход в начало/конец.
+\end{itemize}
+В верхней панели отображаются: текущий день/время симуляции, скорость и прогресс по общему числу тиков. После достижения конца моделирования открывается полноэкранный экран итоговой статистики; на нём можно вернуться к началу/перемотать с помощью кнопок или нажатием \textbf{Space}.
+
+\subsection{Файлы конфигурации}
+\paragraph{settings.json}
+\begin{longtable}{p{4cm}p{10cm}}
+\texttt{cranes\_amount} & объект вида \{\texttt{"BULK":2,"LIQUID":2,"CONTAINER":2}\}; задаёт число кранов каждого типа. \\
+\texttt{ticks\_amount} & длина симуляции в тиках (1 тик = 1 минута). \\
+\texttt{minimum\_deviation\_of\_arrival}, \texttt{maximum\_deviation\_of\_arrival} & случайное смещение прибытия в минутах. \\
+\texttt{minimum\_discharge\_deviation}, \texttt{maximum\_discharge\_deviation} & случайное смещение длительности выгрузки в минутах. \\
+\end{longtable}
+
+\paragraph{schedule.json}
+Поле \texttt{schedule} — массив объектов с полями:
+\begin{itemize}[noitemsep]
+    \item \texttt{ship\_id} (int) — уникальный id.
+    \item \texttt{ship\_name} (string).
+    \item \texttt{arrival\_date} (int, начинается с 1).
+    \item \texttt{arrival\_time} (\texttt{"HH:MM"}).
+    \item \texttt{cargo\_type} (\texttt{bulk}, \texttt{liquid}, \texttt{container}).
+    \item \texttt{cargo\_weight\_tonnes} (int).
+    \item \texttt{planned\_stay\_days} (int).
+\end{itemize}
+
+\section{Руководство программиста}
+\subsection{Архитектура}
+\begin{itemize}[noitemsep]
+    \item \textbf{Settings}/\textbf{SettingsNode} — чтение JSON в типобезопасное дерево.
+    \item \textbf{Schedule} — парсит расписание, генерирует \texttt{ScheduleEvent} с учётом отклонений прибытия.
+    \item \textbf{Crane} — обслуживает одно судно, рассчитывает время окончания выгрузки с учётом скорости типа груза и отклонения; добавляет штраф за просрочку.
+    \item \textbf{Port} — основной цикл по тикам: добавляет прибытия, раздаёт суда доступным кранам, фиксирует события прибытия/входа в кран/отправления в \textbf{EventLog}.
+    \item \textbf{Event}/\textbf{EventLog} — события симуляции.
+    \item \textbf{Statistics} — синглтон, накапливающий MASS, SHIPS, FINE.
+    \item \textbf{PortGUI} — визуализация SFML: очереди, занятые краны, отлетающие корабли, прогресс и полноэкранный экран статистики после окончания симуляции.
+    \item \textbf{Deviations} — генерирует случайные отклонения времени прибытия и разгрузки.
+\end{itemize}
+
+\subsection{Поток данных}
+\begin{enumerate}[noitemsep]
+    \item \texttt{main} загружает пути ресурсов, создаёт \texttt{Port}, выполняет \texttt{port.process()}.
+    \item \texttt{Port::process} симулирует время: \texttt{Schedule} выдаёт прибытия; \texttt{Crane::addShip} ставит корабль в обработку; \texttt{EventLog} пишет события; \texttt{Statistics} обновляется при отправлении и начислении штрафов.
+    \item \texttt{PortGUI} воспроизводит события по времени и рисует состояние.
+\end{enumerate}
+
+\subsection{Расширение и точки модификации}
+\begin{itemize}[noitemsep]
+    \item \textbf{Новый тип груза}: добавить в \texttt{types::CargoType}, в \texttt{getTypeByString}, \texttt{cargoToString}, настроить скорости в \texttt{getSpeedOfUnloadCargo}, цвета в \texttt{PortGUI::colorForCargo}, прописать число кранов в \texttt{settings.json}.
+    \item \textbf{События/логика}: EventLog хранит вектор, сортировка по времени не навязана — при изменении источника событий следить за порядком вставки.
+    \item \textbf{Статистика}: \texttt{Statistics} хранит \texttt{std::map<std::string,int>}; при добавлении новых метрик отображение можно расширить в \texttt{PortGUI::drawOverlay}.
+    \item \textbf{Отклонения}: см. \verb|src/Deviations.cpp| — диапазоны подтягиваются из настроек; можно заменить генератор.
+\end{itemize}
+
+\subsection{Построение и зависимости}
+Файл \verb|CMakeLists.txt| добавляет \verb|src/Statistics.cpp|, ищет nlohmann\_json и SFML, а также учитывает платформенные пути для SFML (Windows/macOS/Linux). Требуется C++20.
+
+\subsection{Отладка}
+\begin{itemize}[noitemsep]
+    \item Проверяйте доступность \verb|settings.json| и \verb|schedule.json| относительно места запуска (см. логику \texttt{resolveResource} в \verb|src/main.cpp|).
+    \item Для запуска без GUI можно временно пропустить создание \texttt{PortGUI} и проверить только \texttt{Port::process()}.
+    \item При падениях на SFML в средах без графики используйте headless-сборку или запускайте в окружении с дисплеем.
+\end{itemize}
+
+\section{Известные ограничения и идеи улучшений}
+\begin{itemize}[noitemsep]
+    \item Нет приоритезации очереди (сейчас FIFO по типу груза).
+    \item Нет сохранения/загрузки состояния симуляции.
+    \item Нет автотестов; логика симуляции может быть покрыта unit-тестами EventLog/Port/Statistics.
+\end{itemize}
+
+\end{document}

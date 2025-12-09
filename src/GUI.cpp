@@ -65,11 +65,13 @@ PortGUI::PortGUI(Port &port, const std::string &settingsFile, const std::string 
 void PortGUI::run() {
     sf::Clock clock;
     while (window_.isOpen()) {
+        rebuildControlButtons();
         handleWindowEvents();
         float dt = clock.restart().asSeconds();
         dt = std::min(dt, 0.1f);
         processSimulation(dt);
         updateDepartures(dt);
+        rebuildControlButtons();
         drawFrame();
     }
 }
@@ -148,7 +150,14 @@ void PortGUI::handleWindowEvents() {
                     window_.close();
                     break;
                 case sf::Keyboard::Key::Space:
-                    paused_ = !paused_;
+                    if (showFinalStats_) {
+                        seekTo(0);
+                        paused_ = false;
+                        finished_ = false;
+                        showFinalStats_ = false;
+                    } else {
+                        paused_ = !paused_;
+                    }
                     break;
                 case sf::Keyboard::Key::Up:
                     adjustTimeScale(+1);
@@ -160,27 +169,56 @@ void PortGUI::handleWindowEvents() {
                     break;
             }
         }
+
+        if (const auto *mousePressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+            if (mousePressed->button == sf::Mouse::Button::Left) {
+                handleControlClick(sf::Vector2f{static_cast<float>(mousePressed->position.x),
+                                                static_cast<float>(mousePressed->position.y)});
+            }
+        }
     }
 }
 
 void PortGUI::processSimulation(float dt) {
-    if (paused_ || events_.empty()) {
+    if (finished_) {
+        simTime_ = static_cast<float>(targetTicks_);
+        return;
+    }
+
+    if (paused_) {
         simTime_ = std::min(simTime_, static_cast<float>(targetTicks_));
         return;
     }
 
     simTime_ = std::min(simTime_ + dt * timeScale_, static_cast<float>(targetTicks_));
 
+    if (events_.empty()) {
+        if (simTime_ >= static_cast<float>(targetTicks_)) {
+            finished_ = true;
+            paused_ = true;
+            showFinalStats_ = true;
+        }
+        return;
+    }
+
     while (nextEventIndex_ < events_.size() && events_[nextEventIndex_]->getTime() <= simTime_) {
-        handleSimulationEvent(events_[nextEventIndex_]);
+        handleSimulationEvent(events_[nextEventIndex_], simTime_, false);
         ++nextEventIndex_;
+    }
+
+    if (simTime_ >= static_cast<float>(targetTicks_) && nextEventIndex_ >= events_.size()) {
+        finished_ = true;
+        paused_ = true;
+        showFinalStats_ = true;
+        simTime_ = static_cast<float>(targetTicks_);
     }
 }
 
-void PortGUI::handleSimulationEvent(const std::shared_ptr<Event> &event) {
+void PortGUI::handleSimulationEvent(const std::shared_ptr<Event> &event, float simNow, bool catchUp) {
     if (!event) {
         return;
     }
+    const float elapsedSinceEvent = catchUp ? std::max(0.f, simNow - static_cast<float>(event->getTime())) : 0.f;
     const auto type = event->getType();
     switch (type) {
         case types::EventType::ON_SHIP_ARRIVAL: {
@@ -231,6 +269,12 @@ void PortGUI::handleSimulationEvent(const std::shared_ptr<Event> &event) {
             departing.velocity = {std::cos(angle) * speed, -std::sin(angle) * speed};
             departing.color = colorForCargo(ship->cargo_type);
             departing.lifetime = 4.5f;
+            if (catchUp && elapsedSinceEvent >= departing.lifetime) {
+                break;
+            }
+            departing.elapsed = catchUp ? std::min(elapsedSinceEvent, departing.lifetime) : 0.f;
+            departing.position += departing.velocity * departing.elapsed;
+            departing.position.y += departing.elapsed * 6.f;
             departingShips_.push_back(departing);
             break;
         }
@@ -250,8 +294,45 @@ void PortGUI::updateDepartures(float dt) {
     departingShips_.erase(std::remove_if(departingShips_.begin(), departingShips_.end(),
                                          [](const DepartingShipVisual &ship) {
                                              return ship.elapsed >= ship.lifetime;
-                                         }),
+                         }),
                           departingShips_.end());
+}
+
+void PortGUI::resetVisualState() {
+    for (auto &queue : queues_) {
+        queue.second.clear();
+    }
+    for (auto &visual : craneVisuals_) {
+        visual.currentShip.reset();
+    }
+    departingShips_.clear();
+}
+
+void PortGUI::seekTo(types::time_t newTime) {
+    types::time_t clamped = std::min<types::time_t>(newTime, targetTicks_);
+    simTime_ = static_cast<float>(clamped);
+    nextEventIndex_ = 0;
+    resetVisualState();
+    for (; nextEventIndex_ < events_.size() && events_[nextEventIndex_]->getTime() <= clamped;
+         ++nextEventIndex_) {
+        handleSimulationEvent(events_[nextEventIndex_], simTime_, true);
+    }
+    paused_ = true;
+    finished_ = (clamped >= targetTicks_) && (nextEventIndex_ >= events_.size());
+    showFinalStats_ = finished_;
+}
+
+void PortGUI::seekBy(int64_t delta) {
+    const int64_t current = static_cast<int64_t>(
+        std::clamp(simTime_, 0.f, static_cast<float>(targetTicks_)));
+    int64_t target = current + delta;
+    if (target < 0) {
+        target = 0;
+    }
+    if (target > static_cast<int64_t>(targetTicks_)) {
+        target = static_cast<int64_t>(targetTicks_);
+    }
+    seekTo(static_cast<types::time_t>(target));
 }
 
 void PortGUI::drawFrame() {
@@ -421,6 +502,151 @@ void PortGUI::drawDepartingShips(sf::RenderTarget &target) {
     }
 }
 
+void PortGUI::rebuildControlButtons() {
+    controlButtons_.clear();
+    const std::size_t buttonCount = 7;
+    const float totalWidth =
+        buttonCount * controlButtonWidth_ + (buttonCount - 1) * controlButtonSpacing_;
+    float x = (windowWidth_ - totalWidth) / 2.f;
+    float y = windowHeight_ - verticalMargin_ - controlButtonHeight_ - 8.f;
+
+    auto addButton = [&](ButtonAction action, const std::string &label) {
+        controlButtons_.push_back(ControlButton{
+            sf::FloatRect({x, y}, {controlButtonWidth_, controlButtonHeight_}), label, action});
+        x += controlButtonWidth_ + controlButtonSpacing_;
+    };
+
+    addButton(ButtonAction::Restart, "Restart");
+    addButton(ButtonAction::BackDay, "-1 day");
+    addButton(ButtonAction::BackHour, "-1 hour");
+    addButton(ButtonAction::TogglePause, paused_ ? "Play" : "Pause");
+    addButton(ButtonAction::ForwardHour, "+1 hour");
+    addButton(ButtonAction::ForwardDay, "+1 day");
+    addButton(ButtonAction::JumpToEnd, "To end");
+}
+
+void PortGUI::handleControlClick(sf::Vector2f mousePos) {
+    for (const auto &button : controlButtons_) {
+        if (!button.bounds.contains(mousePos)) {
+            continue;
+        }
+        switch (button.action) {
+            case ButtonAction::Restart:
+                seekTo(0);
+                finished_ = false;
+                showFinalStats_ = false;
+                paused_ = false;
+                break;
+            case ButtonAction::BackDay:
+                showFinalStats_ = false;
+                seekBy(-static_cast<int64_t>(types::MINS_IN_DAY));
+                break;
+            case ButtonAction::BackHour:
+                showFinalStats_ = false;
+                seekBy(-static_cast<int64_t>(types::MINS_IN_HOUR));
+                break;
+            case ButtonAction::TogglePause:
+                if (finished_) {
+                    seekTo(0);
+                    finished_ = false;
+                    showFinalStats_ = false;
+                    paused_ = false;
+                } else {
+                    paused_ = !paused_;
+                }
+                break;
+            case ButtonAction::ForwardHour:
+                showFinalStats_ = false;
+                seekBy(static_cast<int64_t>(types::MINS_IN_HOUR));
+                break;
+            case ButtonAction::ForwardDay:
+                showFinalStats_ = false;
+                seekBy(static_cast<int64_t>(types::MINS_IN_DAY));
+                break;
+            case ButtonAction::JumpToEnd:
+                seekTo(targetTicks_);
+                finished_ = true;
+                showFinalStats_ = true;
+                paused_ = true;
+                break;
+        }
+        break;
+    }
+}
+
+void PortGUI::drawControlButtons(sf::RenderTarget &target) {
+    sf::Vector2i mousePixel = sf::Mouse::getPosition(window_);
+    sf::Vector2f mousePos{static_cast<float>(mousePixel.x), static_cast<float>(mousePixel.y)};
+    for (const auto &button : controlButtons_) {
+        bool hovered = button.bounds.contains(mousePos);
+        sf::RectangleShape rect({button.bounds.size.x, button.bounds.size.y});
+        rect.setPosition(button.bounds.position);
+        rect.setFillColor(hovered ? sf::Color(70, 110, 150, 220) : sf::Color(35, 70, 110, 190));
+        rect.setOutlineThickness(1.6f);
+        rect.setOutlineColor(sf::Color(200, 220, 240, hovered ? 230 : 170));
+        target.draw(rect);
+
+        sf::Text label = makeText(button.label, 16);
+        const auto bounds = label.getGlobalBounds();
+        label.setPosition(
+            sf::Vector2f{button.bounds.position.x + (button.bounds.size.x - bounds.size.x) / 2.f,
+                         button.bounds.position.y + (button.bounds.size.y - bounds.size.y) / 2.f - 4.f});
+        label.setFillColor(sf::Color(235, 240, 245));
+        target.draw(label);
+    }
+}
+
+void PortGUI::drawFinalStatistics(sf::RenderTarget &target) {
+    sf::RectangleShape overlay({windowWidth_, windowHeight_});
+    overlay.setFillColor(sf::Color(8, 12, 24, 235));
+    target.draw(overlay);
+
+    sf::Text title = makeText("Simulation finished", 40);
+    auto titleBounds = title.getGlobalBounds();
+    title.setPosition(
+        sf::Vector2f{windowWidth_ / 2.f - titleBounds.size.x / 2.f, 96.f});
+    target.draw(title);
+
+    const auto stats = Statistics::getInstance()->getStatistics();
+    const auto statValue = [&](const std::string &key) -> std::int64_t {
+        const auto it = stats.find(key);
+        return it != stats.end() ? static_cast<std::int64_t>(it->second) : 0;
+    };
+
+    const std::int64_t ships = statValue("SHIPS");
+    const std::int64_t cargo = statValue("MASS");
+    const std::int64_t fineMinutes = statValue("FINE");
+    const int fineCost = (fineMinutes / types::MINS_IN_DAY) * 2000;
+
+    sf::RectangleShape panel(
+        {windowWidth_ - 2.f * horizontalMargin_, 260.f});
+    panel.setPosition(sf::Vector2f{horizontalMargin_, 200.f});
+    panel.setFillColor(sf::Color(20, 34, 60, 230));
+    panel.setOutlineColor(sf::Color(90, 130, 180, 240));
+    panel.setOutlineThickness(2.f);
+    target.draw(panel);
+
+    sf::Text shipsText = makeText("Ships handled: " + std::to_string(ships), 28);
+    shipsText.setPosition(sf::Vector2f{panel.getPosition().x + 24.f, panel.getPosition().y + 26.f});
+    target.draw(shipsText);
+
+    sf::Text cargoText = makeText("Cargo handled: " + std::to_string(cargo) + " t", 28);
+    cargoText.setPosition(sf::Vector2f{panel.getPosition().x + 24.f, panel.getPosition().y + 86.f});
+    target.draw(cargoText);
+
+    std::ostringstream fineStream;
+    fineStream << "Penalty time: " << fineMinutes << " min"
+               << "   (~" << std::fixed << std::setprecision(2) << fineCost * -1 << " BTC)";
+    sf::Text fineText = makeText(fineStream.str(), 28);
+    fineText.setPosition(sf::Vector2f{panel.getPosition().x + 24.f, panel.getPosition().y + 146.f});
+    target.draw(fineText);
+
+    sf::Text hint = makeText("Use the buttons below to rewind or replay. Press Esc to exit.", 20);
+    auto hintBounds = hint.getGlobalBounds();
+    hint.setPosition(sf::Vector2f{windowWidth_ / 2.f - hintBounds.size.x / 2.f, panel.getPosition().y + 206.f});
+    target.draw(hint);
+}
+
 void PortGUI::drawOverlay(sf::RenderTarget &target) {
     sf::Text title = makeText("Port operation visualizer", 26);
     title.setPosition(sf::Vector2f{horizontalMargin_, 10.f});
@@ -445,44 +671,9 @@ void PortGUI::drawOverlay(sf::RenderTarget &target) {
     speedText.setPosition(sf::Vector2f{horizontalMargin_ + 280.f, 44.f});
     target.draw(speedText);
 
-    const auto stats = Statistics::getInstance()->getStatistics();
-    const auto statValue = [&](const std::string &key) -> std::int64_t {
-        const auto it = stats.find(key);
-        return it != stats.end() ? static_cast<std::int64_t>(it->second) : 0;
-    };
-
-    const float statsWidth = 380.f;
-    const float statsHeight = 56.f;
-    const float statsLeft = windowWidth_ - horizontalMargin_ - statsWidth;
-    const float statsTop = 10.f;
-
-    sf::RectangleShape statsPanel({statsWidth, statsHeight});
-    statsPanel.setPosition(sf::Vector2f{statsLeft, statsTop});
-    statsPanel.setFillColor(sf::Color(16, 28, 48, 190));
-    statsPanel.setOutlineColor(sf::Color(45, 60, 80, 220));
-    statsPanel.setOutlineThickness(1.4f);
-    target.draw(statsPanel);
-
-    std::ostringstream cargoStats;
-    cargoStats << "Ships: " << statValue("SHIPS") << "    Cargo: " << statValue("MASS") << " t";
-    sf::Text cargoText = makeText(cargoStats.str(), 16);
-    cargoText.setPosition(sf::Vector2f{statsLeft + 10.f, statsTop + 12.f});
-    cargoText.setFillColor(sf::Color(220, 230, 245));
-    target.draw(cargoText);
-
-    std::ostringstream fineStats;
-    fineStats << "Penalty time: " << statValue("FINE") << " min";
-    sf::Text fineText = makeText(fineStats.str(), 16);
-    fineText.setPosition(sf::Vector2f{statsLeft + 10.f, statsTop + 32.f});
-    fineText.setFillColor(sf::Color(220, 230, 245));
-    target.draw(fineText);
-
-    sf::Text instructionText =
-        makeText("Space: pause/resume   Up/Down: change speed   Esc: exit", 16);
-    instructionText.setPosition(
-        sf::Vector2f{horizontalMargin_, windowHeight_ - verticalMargin_ - 24.f});
-    instructionText.setFillColor(sf::Color(210, 220, 235));
-    target.draw(instructionText);
+    sf::Text stateText = makeText(paused_ ? "State: paused" : "State: playing", 18);
+    stateText.setPosition(sf::Vector2f{horizontalMargin_ + 520.f, 44.f});
+    target.draw(stateText);
 
     float progress = targetTicks_ > 0 ? clampUnit(simTime_ / static_cast<float>(targetTicks_)) : 0.f;
     sf::RectangleShape progressBg({windowWidth_ - 2.f * horizontalMargin_, 10.f});
@@ -494,6 +685,21 @@ void PortGUI::drawOverlay(sf::RenderTarget &target) {
     progressFill.setPosition(progressBg.getPosition());
     progressFill.setFillColor(sf::Color(120, 200, 255));
     target.draw(progressFill);
+
+    sf::Text instructionText = makeText(
+        "Space: pause/resume   Up/Down: speed   Esc: exit   Buttons: rewind/forward", 16);
+    instructionText.setPosition(
+        sf::Vector2f{horizontalMargin_, windowHeight_ - verticalMargin_ - controlButtonHeight_ - 24.f});
+    instructionText.setFillColor(sf::Color(210, 220, 235));
+    target.draw(instructionText);
+
+    if (showFinalStats_) {
+        drawFinalStatistics(target);
+        drawControlButtons(target);
+        return;
+    }
+
+    drawControlButtons(target);
 
     if (paused_) {
         sf::RectangleShape overlay({windowWidth_, windowHeight_});

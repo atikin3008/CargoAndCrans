@@ -47,17 +47,40 @@ class PortGUI {
     void buildLayout();
     void handleWindowEvents();
     void processSimulation(float dt);
-    void handleSimulationEvent(const std::shared_ptr<Event> &event);
+    void handleSimulationEvent(const std::shared_ptr<Event> &event, float simNow, bool catchUp);
     void updateDepartures(float dt);
     void drawFrame();
     void drawCranes(sf::RenderTarget &target);
     void drawQueues(sf::RenderTarget &target);
     void drawDepartingShips(sf::RenderTarget &target);
     void drawOverlay(sf::RenderTarget &target);
+    void drawFinalStatistics(sf::RenderTarget &target);
+    void drawControlButtons(sf::RenderTarget &target);
+    void rebuildControlButtons();
     sf::Color colorForCargo(types::CargoType type, float alpha = 1.f) const;
     sf::Text makeText(const std::string &text, unsigned size) const;
     sf::Vector2f craneCenter(const CraneVisual &visual) const;
     void adjustTimeScale(int direction);
+    void resetVisualState();
+    void seekTo(types::time_t newTime);
+    void seekBy(int64_t delta);
+    void handleControlClick(sf::Vector2f mousePos);
+
+    enum class ButtonAction {
+        Restart,
+        BackDay,
+        BackHour,
+        TogglePause,
+        ForwardHour,
+        ForwardDay,
+        JumpToEnd
+    };
+
+    struct ControlButton {
+        sf::FloatRect bounds{};
+        std::string label;
+        ButtonAction action{};
+    };
 
     const float windowWidth_ = 1600.f;
     const float windowHeight_ = 900.f;
@@ -66,6 +89,9 @@ class PortGUI {
     const float columnSpacing_ = 42.f;
     const float topBarHeight_ = 84.f;
     const float queueHeight_ = 200.f;
+    const float controlButtonHeight_ = 44.f;
+    const float controlButtonWidth_ = 112.f;
+    const float controlButtonSpacing_ = 12.f;
     static constexpr std::size_t kMaxCraneRows = 7;
 
     Port &port_;
@@ -81,10 +107,13 @@ class PortGUI {
     std::map<types::CargoType, std::size_t> typeTotals_;
     std::map<types::CargoType, std::size_t> actualTypeCounts_;
     std::vector<types::CargoType> typeOrder_;
+    std::vector<ControlButton> controlButtons_;
 
     float simTime_ = 0.f;
     std::size_t nextEventIndex_ = 0;
     float timeScale_ = 240000.f;
     bool paused_ = false;
+    bool finished_ = false;
+    bool showFinalStats_ = false;
     types::time_t targetTicks_ = 0;
 };
