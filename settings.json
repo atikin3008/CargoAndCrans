@@ -8,5 +8,5 @@
     "maximum_discharge_deviation": 4,
     "minimum_deviation_of_arrival": -6,
     "minimum_discharge_deviation": -3,
-    "ticks_amount": 100000
+    "ticks_amount": 50000
 }
