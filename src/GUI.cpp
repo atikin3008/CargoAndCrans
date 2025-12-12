@@ -84,7 +84,7 @@ void PortGUI::buildLayout() {
         (totalWidth - columnSpacing_ * static_cast<float>(typeCount - 1)) / static_cast<float>(typeCount);
 
     const float craneTop = topBarHeight_;
-    const float craneHeight = windowHeight_ - craneTop - queueHeight_ - verticalMargin_;
+    const float craneHeight = windowHeight_ - craneTop - queueHeight_ - verticalMargin_ - 100;
     const float queueTop = craneTop + craneHeight + 24.f;
 
     for (std::size_t idx = 0; idx < typeCount; ++idx) {
@@ -508,7 +508,7 @@ void PortGUI::rebuildControlButtons() {
     const float totalWidth =
         buttonCount * controlButtonWidth_ + (buttonCount - 1) * controlButtonSpacing_;
     float x = (windowWidth_ - totalWidth) / 2.f;
-    float y = windowHeight_ - verticalMargin_ - controlButtonHeight_ - 8.f;
+    float y = windowHeight_ - verticalMargin_ - controlButtonHeight_ - 8.f + 10;
 
     auto addButton = [&](ButtonAction action, const std::string &label) {
         controlButtons_.push_back(ControlButton{

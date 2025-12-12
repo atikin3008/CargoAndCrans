@@ -1,12 +1,12 @@
 {
     "cranes_amount": {
-        "BULK": 21,
-        "CONTAINER": 2,
-        "LIQUID": 2
+        "BULK": 1,
+        "CONTAINER": 1,
+        "LIQUID": 1
     },
     "maximum_deviation_of_arrival": 5,
     "maximum_discharge_deviation": 4,
     "minimum_deviation_of_arrival": -6,
     "minimum_discharge_deviation": -3,
-    "ticks_amount": 50000
+    "ticks_amount": 500000
 }

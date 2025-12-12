@@ -83,7 +83,7 @@ class PortGUI {
     };
 
     const float windowWidth_ = 1600.f;
-    const float windowHeight_ = 900.f;
+    const float windowHeight_ = 1000.f;
     const float horizontalMargin_ = 40.f;
     const float verticalMargin_ = 30.f;
     const float columnSpacing_ = 42.f;
