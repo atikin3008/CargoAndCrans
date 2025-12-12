@@ -15,8 +15,8 @@
 #include <QVBoxLayout>
 
 namespace {
-constexpr int kDefaultMinValue = -100000;
-constexpr int kDefaultMaxValue = 100000;
+constexpr int kDefaultMinValue = -21;
+constexpr int kDefaultMaxValue = 21;
 }
 
 namespace editor {

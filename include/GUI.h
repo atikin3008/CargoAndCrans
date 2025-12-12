@@ -111,7 +111,7 @@ class PortGUI {
 
     float simTime_ = 0.f;
     std::size_t nextEventIndex_ = 0;
-    float timeScale_ = 240000.f;
+    float timeScale_ = 30.f;
     bool paused_ = false;
     bool finished_ = false;
     bool showFinalStats_ = false;
