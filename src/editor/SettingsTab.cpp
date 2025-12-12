@@ -41,11 +41,11 @@ void SettingsTab::buildUi() {
     auto *cranesBox = new QGroupBox(tr("Количество кранов"));
     auto *cranesLayout = new QFormLayout(cranesBox);
     bulkSpin_ = new QSpinBox();
-    bulkSpin_->setRange(0, kDefaultMaxValue);
+    bulkSpin_->setRange(0, 21);
     liquidSpin_ = new QSpinBox();
-    liquidSpin_->setRange(0, kDefaultMaxValue);
+    liquidSpin_->setRange(0, 21);
     containerSpin_ = new QSpinBox();
-    containerSpin_->setRange(0, kDefaultMaxValue);
+    containerSpin_->setRange(0, 21);
     cranesLayout->addRow(tr("Bulk"), bulkSpin_);
     cranesLayout->addRow(tr("Liquid"), liquidSpin_);
     cranesLayout->addRow(tr("Container"), containerSpin_);
